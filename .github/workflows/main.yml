@@ -41,5 +41,7 @@ jobs:
           script: |
             cd /home/ubuntu/node_server
             git pull origin main
+            sudo apt install npm
             npm install
+            sudo npm i -g npx
             npx pm2 restart app
