@@ -1,0 +1,38 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set Permissions for SSH Private Key
+        run: chmod 600 yank-server-key.pem
+
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22  # Set the appropriate port
+          script: |
+            cd /home/ubuntu/node_server
+            git pull
+            npm install
+            pm2 restart app
