@@ -8,7 +8,8 @@ const app = express();
 
 
 //=====================================CONFIGURE EXPRESS
-app.use(cors()); //chatgpt
+// app.use(cors()); //chatgpt
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
 
