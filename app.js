@@ -13,9 +13,44 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
 
+
+// =================================== Enable CORS for all routes website
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+
+//   if (req.method === 'OPTIONS') {
+//     res.sendStatus(200);
+//   } else {
+//     next();
+//   }
+// });
+
 //=================================== Enable CORS for all routes website
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   res.header('Access-Control-Allow-Credentials', 'true');
+
+//   if (req.method === 'OPTIONS') {
+//     res.sendStatus(200);
+//   } else {
+//     next();
+//   }
+// });
+
+
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
+  const allowedOrigins = ['http://127.0.0.1:5500', 'http://www.yandkbuildcon.com'];
+
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -26,6 +61,8 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+
 
 // // Custom CORS configuration
 // app.use((req, res, next) => {
