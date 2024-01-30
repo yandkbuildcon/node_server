@@ -26,6 +26,21 @@ app.use((req, res, next) => {
   }
 });
 
+// Custom CORS configuration
+app.use((req, res, next) => {
+  // Set the 'Access-Control-Allow-Origin' header based on environment variable or default to '*'
+  res.header('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGIN || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
 //===============================================router imported
 
 const customerRouter = require('./api/router/customer_router');
@@ -34,7 +49,6 @@ const adminRouter = require('./api/router/admin_router');
 //===============================================point endpoint router
 app.use('/api/customer', customerRouter);
 app.use('/api/admin', adminRouter);
-
 
 
 //=========================================accessing property images
