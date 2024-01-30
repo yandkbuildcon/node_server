@@ -44,4 +44,5 @@ jobs:
             sudo apt install npm
             npm install
             sudo npm i -g npx
+            npm install pm2@latest
             npx pm2 restart app
