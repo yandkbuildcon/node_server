@@ -22,15 +22,15 @@ jobs:
         run: npm install
 
       - name: Set Permissions for SSH Private Key
-        run: chmod 600 yank-server-key.pem
+        run: chmod 600 ${{ runner.workspace }}/yank-server-key.pem
 
-      - name: SSH into EC2 and deploy
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22  # Set the appropriate port
+          key: ${{ runner.workspace }}/yank-server-key.pem
+          port: 22
           script: |
             cd /home/ubuntu/node_server
             git pull
