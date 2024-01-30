@@ -40,6 +40,6 @@ jobs:
           port: 22
           script: |
             cd /home/ubuntu/node_server
-            git pull
+            git pull origin main
             npm install
-            pm2 restart app
+            npx pm2 restart app
