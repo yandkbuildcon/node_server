@@ -116,12 +116,12 @@ const options = {
   cert: fs.readFileSync('/etc/letsencrypt/live/api.yandkbuildcon.com/fullchain.pem'),
 };
 
-const app = https.createServer(options, app);
+const server = https.createServer(options, app);
 // ---------------------------------------------------------------------------
 
 
 
-app.listen(process.env.host_port, ()=>{
+server.listen(process.env.host_port, ()=>{
     console.log('server listening on port ', process.env.host_port);
 });
 
