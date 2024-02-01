@@ -10,7 +10,7 @@ const app = express();
 
 //=====================================CONFIGURE EXPRESS
 app.use(cors({
-  origin:"https://www.yandkbuildcon.com",
+  origin:"https://bhuiyan.vercel.app",
   methods:["GET","POST","PUT","DELETE"],
   credentials:true
 })); //chatgpt
