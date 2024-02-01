@@ -13,11 +13,6 @@ app.use(cors()); //chatgpt
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 5a983501506d597b61f667aa19bd8a7f10690588
 //===============================================router imported
 
 const customerRouter = require('./api/router/customer_router');
