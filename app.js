@@ -104,14 +104,6 @@ app.use((req, res) => {
 // -------------------------------------------webpage end
 
 
-// ---------------------------------------------------------------------------
-
-const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/fullchain.pem'),
-};
-
-const server = https.createServer(options, app);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -119,15 +111,24 @@ app.use((err, req, res, next) => {
   res.status(500).send('Internal Server Error');
 });
 
-// Start the server
-// server.listen(process.env.host_port, () => {
-//   console.log('Server listening on port ', process.env.host_port);
-// });
 // ---------------------------------------------------------------------------
 
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/fullchain.pem'),
+};
+
+const httpsServer = https.createServer(options, app);
+httpsServer.listen(process.env.host_port, () => {
+  console.log('HTTPS Server listening on port ', process.env.host_port);
+});
+
+// ---------------------------------------------------------------------------
+// Start the HTTP server on port 80
 
 
-server.listen(process.env.host_port, ()=>{
+
+app.listen(process.env.host_port, ()=>{
     console.log('server listening on port ', process.env.host_port);
 });
 
