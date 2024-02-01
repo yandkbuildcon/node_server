@@ -112,6 +112,17 @@ const options = {
 };
 
 const server = https.createServer(options, app);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).send('Internal Server Error');
+});
+
+// Start the server
+// server.listen(process.env.host_port, () => {
+//   console.log('Server listening on port ', process.env.host_port);
+// });
 // ---------------------------------------------------------------------------
 
 
