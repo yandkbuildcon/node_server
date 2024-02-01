@@ -9,7 +9,7 @@ const app = express();
 
 //=====================================CONFIGURE EXPRESS
 app.use(cors({
-  origin:"yandkbuildcon.com",
+  origin:"https://www.yandkbuildcon.com",
   methods:["GET","POST","PUT","DELETE"],
   credentials:true
 })); //chatgpt
