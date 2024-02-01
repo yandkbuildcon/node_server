@@ -119,8 +119,8 @@ const options = {
 };
 
 const httpsServer = https.createServer(options, app);
-httpsServer.listen(process.env.host_port, () => {
-  console.log('HTTPS Server listening on port ', process.env.host_port);
+httpsServer.listen(80, () => {
+  console.log('HTTPS Server listening on port 80 ');
 });
 
 // ---------------------------------------------------------------------------
