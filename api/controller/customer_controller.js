@@ -9,7 +9,8 @@ function customerSignup(req,res){
          console.log('something went wrong while signup customer');
          return res.status(500).json({
              success:false,
-             message:"something went wrong while signup customer"
+             message:"something went wrong while signup customer",
+             error:''
          })
       }
       if (result.message) {
@@ -17,6 +18,7 @@ function customerSignup(req,res){
          return res.status(400).json({
              success: false,
              message: result.message,
+             error:''
          });
      }
       return res.status(200).json({
@@ -37,6 +39,7 @@ function sendOtpForSignup(req, res) {
          return res.status(400).json({
            success: false,
            message: result.message,
+           error:''
          });
        }
  
@@ -51,6 +54,7 @@ function sendOtpForSignup(req, res) {
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while signup customer',
+         error:''
        });
      });
 }
@@ -63,7 +67,8 @@ function verifyOtpForSignup(req,res){
            console.log('something went wrong while verify otp');
            return res.status(500).json({
                success:false,
-               message:"something went wrong while verify otp"
+               message:"something went wrong while verify otp",
+               error:''
            })
         }
         if (result.message) {
@@ -71,6 +76,7 @@ function verifyOtpForSignup(req,res){
            return res.status(400).json({
                success: false,
                message: result.message,
+               error:''
            });
        }
      
@@ -84,6 +90,9 @@ function verifyOtpForSignup(req,res){
 }
 
 
+
+
+
 function sendOtpForLogin(req, res) {
     const data = req.body;
   
@@ -95,6 +104,7 @@ function sendOtpForLogin(req, res) {
           return res.status(400).json({
             success: false,
             message: result.message,
+            error:''
           });
         }
   
@@ -109,6 +119,7 @@ function sendOtpForLogin(req, res) {
         return res.status(500).json({
           success: false,
           message: 'Something went wrong while signup customer',
+          error:''
         });
       });
 }
@@ -120,7 +131,8 @@ function verifyOtpForLogin(req,res){
             console.log('something went wrong while verify otp');
             return res.status(500).json({
                 success:false,
-                message:"something went wrong while verify otp"
+                message:"something went wrong while verify otp",
+                error:''
             })
          }
          if (result.message) {
@@ -128,6 +140,7 @@ function verifyOtpForLogin(req,res){
             return res.status(400).json({
                 success: false,
                 message: result.message,
+                error:''
             });
         }
       
@@ -147,7 +160,8 @@ function customerProfile(req,res){
             console.log('something went wrong while signup customer');
             return res.status(500).json({
                 success:false,
-                message:"something went wrong while signup customer"
+                message:"something went wrong while signup customer",
+                error:''
             })
          }
          console.log(result);
@@ -176,7 +190,8 @@ function uploadProfilePic(req,res){
       return res.status(500).json(
          {
             success:false,
-            message:"error uploading profile pci"
+            message:"error uploading profile pci",
+            error:''
          }
       )
     });
@@ -196,7 +211,8 @@ function fetchAllProperties(req,res){
            console.log('something went wrong while fetching properties');
            return res.status(500).json({
                success:false,
-               message:"something went wrong while fetching properties"
+               message:"something went wrong while fetching properties",
+               error:''
            })
         }
         return res.status(200).json({
@@ -208,6 +224,32 @@ function fetchAllProperties(req,res){
 
    } );
 }
+
+// =========================================fetch all properties with pagination and filter
+function fetchAllPropertiesWithPaginationAndFilter(req,res){
+   const { filterOptions, paginationOptions } = req.body;
+   customerService.fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOptions,(error,result)=>{
+         
+       if(error){
+           console.log(error);
+           console.log('something went wrong while fetching properties');
+           return res.status(500).json({
+               success:false,
+               message:"something went wrong while fetching properties",
+               error:''
+           })
+        }
+        return res.status(200).json({
+           success:true,
+           message:"property successfully fetched.",
+           result:result
+        })
+
+
+   } );
+}
+
+
 function fetchSinglePropertyById(req,res){
    const p_id = req.body.p_id;
    customerService.fetchSinglePropertyById(p_id).then((result) => {
@@ -225,7 +267,8 @@ function fetchSinglePropertyById(req,res){
       return res.status(500).json(
          {
             success:false,
-            message:"error fetching property"
+            message:"error fetching property",
+            error:''
          }
       )
     });
@@ -246,7 +289,8 @@ function fetchOfferList(req,res){
       return res.status(500).json(
          {
             success:false,
-            message:"error fetching offers"
+            message:"error fetching offers",
+            error:''
          }
       )
     });
@@ -267,7 +311,8 @@ function submitPropertyRating(req,res){
       return res.status(500).json(
          {
             success:false,
-            message:"error submitting rating"
+            message:"error submitting rating",
+            error:''
          }
       )
     });
@@ -288,7 +333,8 @@ function fetchAdminContact(req,res){
       return res.status(500).json(
          {
             success:false,
-            message:"error fetching contact"
+            message:"error fetching contact",
+            error:''
          }
       )
     });
@@ -308,13 +354,14 @@ function addtoFavorite(req,res){
       console.log('something went wrong while adding to favorites');
       return res.status(500).json({
           success:false,
-          message:"something went wrong while adding to favorites"
+          message:"something went wrong while adding to favorites",
+          error:''
       })
    }
    console.log(result);
          return res.status(200).json({
             success:true,
-            message:"successfully added to favorites"
+            message:"successfully added to favorites",
          })
 
   });
@@ -327,7 +374,8 @@ function removeFromFavorite(req,res){
       console.log('something went wrong while removing from favorites');
       return res.status(500).json({
           success:false,
-          message:"something went wrong while removing from favorites"
+          message:"something went wrong while removing from favorites",
+          error:''
       })
    }
    console.log(result);
@@ -347,6 +395,7 @@ function fetchFavoriteProperty(req,res){
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching favorite property",
+          error:''
           
       })
    }
@@ -367,6 +416,7 @@ function fetchFavoritePropertyListDetails(req,res){
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching favorite property",
+          error:''
           
       })
    }
@@ -390,7 +440,8 @@ function requestVisit(req,res){
            console.log('something went wrong while requating for visit');
            return res.status(500).json({
                success:false,
-               message:"something went wrong while requesting for visit"
+               message:"something went wrong while requesting for visit",
+               error:''
            })
         }
         return res.status(200).json({
@@ -400,14 +451,16 @@ function requestVisit(req,res){
    });
 } 
 function fetchVisitRequestedList(req,res){
+   const { filterOptions, paginationOptions } = req.body;
   const data = req.body;
-  customerService.fetchVisitRequestedList(data,(error,result)=>{
+  customerService.fetchVisitRequestedList(filterOptions,paginationOptions,data,(error,result)=>{
     if(error){
       console.log(error);
       console.log('something went wrong while fetching visit requested list');
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching visit requested list",
+          error:''
           
       })
    }
@@ -428,6 +481,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
        return res.status(500).json({
            success:false,
            message:"something went wrong while fetching visit requested list property details",
+           error:''
            
        })
     }
@@ -455,6 +509,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
 
 
   fetchAllProperties, 
+  fetchAllPropertiesWithPaginationAndFilter,
   fetchSinglePropertyById,
   submitPropertyRating,
   fetchOfferList,

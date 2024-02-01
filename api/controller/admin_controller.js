@@ -13,6 +13,7 @@ function sendOtpForAdminLogin(req, res) {
          return res.status(400).json({
            success: false,
            message: result.message,
+           error:''
          });
        }
  
@@ -27,6 +28,7 @@ function sendOtpForAdminLogin(req, res) {
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while send otp admin',
+         error:''
        });
      });
 }
@@ -42,6 +44,7 @@ function verifyOtpForAdminLogin(req, res) {
          return res.status(400).json({
            success: false,
            message: result.message,
+           error:''
          });
        }
        return res.status(200).json({
@@ -56,6 +59,7 @@ function verifyOtpForAdminLogin(req, res) {
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while verifying otp',
+         error:''
        });
      });
 }
@@ -78,6 +82,7 @@ function adminProfile(req, res){
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while fetching admin profile',
+         error:''
        });
      });
 } 
@@ -100,7 +105,8 @@ function insertAdminContact(req,res){
        return res.status(500).json(
           {
              success:false,
-             message:"error inserting contact"
+             message:"error inserting contact",
+             error:''
           }
        )
      });
@@ -126,7 +132,8 @@ function uploadOffer(req,res){
          return res.status(500).json(
             {
                success:false,
-               message:"error uploading offer image"
+               message:"error uploading offer image",
+               error:''
             }
          )
        });
@@ -134,8 +141,9 @@ function uploadOffer(req,res){
 
 
 function fetchCustomerRequest(req,res){
+  const { filterOptions, paginationOptions } = req.body;
       
-      adminService.fetchCustomerRequest().then((result) => {
+      adminService.fetchCustomerRequest(filterOptions, paginationOptions).then((result) => {
          console.log('customer request fetch successfully:', result);
          return res.status(200).json(
             {
@@ -150,7 +158,8 @@ function fetchCustomerRequest(req,res){
          return res.status(500).json(
             {
                success:false,
-               message:"error fetching customer request"
+               message:"error fetching customer request",
+               error:''
             }
          )
        });
@@ -164,7 +173,8 @@ function insertPropertyDetails(req,res){
            console.log('something went wrong while inserting property details');
            return res.status(500).json({
                success:false,
-               message:"something went wrong while inserting property details"
+               message:"something went wrong while inserting property details",
+               error:''
            })
         }
         if (result.message) {
@@ -172,6 +182,7 @@ function insertPropertyDetails(req,res){
            return res.status(400).json({
                success: false,
                message: result.message,
+               error:''
            });
        }
         return res.status(200).json({
@@ -193,7 +204,8 @@ function uploadPropertyImage(req,res){
           console.log('something went wrong while uploading property image');
           return res.status(500).json({
               success:false,
-              message:"something went wrong while uploading property image"
+              message:"something went wrong while uploading property image",
+              error:''
           })
        }
        return res.status(200).json({
@@ -214,7 +226,8 @@ function deletePropertyImage(req,res){
           console.log('something went wrong while deleting property image');
           return res.status(500).json({
               success:false,
-              message:"something went wrong while deleting property image"
+              message:"something went wrong while deleting property image",
+              error:''
           })
        }
        return res.status(200).json({
@@ -242,7 +255,8 @@ function changeVisitStatus(req,res){
      return res.status(500).json(
         {
            success:false,
-           message:"error changing status"
+           message:"error changing status",
+           error:''
         }
      )
    });

@@ -136,25 +136,49 @@ function uploadOffer(offerImage, text1, text2, text3, p_id){
   });
   }
 
-function fetchCustomerRequest(){
+function fetchCustomerRequest(filterOptions, paginationOptions){
+     // Define the filter conditions
+  console.log(`filter option is ${filterOptions.propertytype}`);
+  console.log(`pegination option is ${paginationOptions}`);
+  const filterConditions = [];
+  const filterValues = [];
+   // Check if propertybhk is provided
+if (filterOptions.requestStatus !== undefined && filterOptions.requestStatus !== null) {
+    if (filterOptions.requestStatus === 4) {
+      // Include less than 4 bhk
+      filterConditions.push(`v_status <= ${filterOptions.requestStatus}`);
+    } else {
+      // Include specific request status
+      filterConditions.push(`v_status = ${filterOptions.requestStatus}`);
+      //filterValues.push(filterOptions.propertybhk);
+    }
+  }
+  // Construct the WHERE clause based on the filter conditions
+  const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
+
+  // Construct the SQL query with pagination and filtering
+  const sqlQuery = `
+         SELECT
+         visit.*,
+         customer.*,
+         property.*
+            FROM visit
+         JOIN
+            customer ON visit.customer_id = customer.customer_id
+         JOIN
+            property ON visit.property_id = property.property_id
+            ${whereClause}
+            ORDER BY
+            visit.v_date DESC   
+         LIMIT ?, ?; 
+    `;
+
+
     return new Promise((resolve, reject) => {
         // Check if the combination of u_id and s_id already exists
         conn.query(
-            `
-            SELECT
-            visit.*,
-            customer.*,
-            property.*
-        FROM
-            visit
-        JOIN
-            customer ON visit.customer_id = customer.customer_id
-        JOIN
-            property ON visit.property_id = property.property_id;
-         `,
-            [
-              
-            ],
+            sqlQuery,
+            [(paginationOptions.page-1)*paginationOptions.limit,paginationOptions.limit],
             (selectError, selectResult) => {
                 if (selectError) {
                     reject(selectError);

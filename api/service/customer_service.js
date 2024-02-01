@@ -264,6 +264,138 @@ function fetchAllProperties(callback){
   );
 }
 
+//===========================================fetch all proeprty by pegination
+function fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOptions, callback) {
+  // Define the filter conditions
+  console.log(`filter option is ${filterOptions.propertytype}`);
+  console.log(`pegination option is ${paginationOptions}`);
+  const filterConditions = [];
+  const filterValues = [];
+
+  if (filterOptions.propertytype) {
+    filterConditions.push(`property_type = '${filterOptions.propertytype}'`);
+    filterValues.push(filterOptions.propertytype);
+  }
+
+  // Check if propertybhk is provided
+if (filterOptions.propertybhk !== undefined && filterOptions.propertybhk !== null) {
+  if (filterOptions.propertybhk === 0) {
+    // Include 0 bhk and greater than 0 bhk
+    filterConditions.push(`property_bhk >= ${0}`);
+  } else {
+    // Include specific bhk
+    filterConditions.push(`property_bhk = ${filterOptions.propertybhk}`);
+    filterValues.push(filterOptions.propertybhk);
+  }
+}
+
+// Check if propertyfloor is provided
+if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !== null) {
+  if (filterOptions.propertyfloor === 0) {
+    // Include 0 floor and greater than 0 floor
+    filterConditions.push(`property_floor >= 0`);
+  } else {
+    // Include specific floor
+    filterConditions.push(`property_floor = ${filterOptions.propertyfloor}`);
+    filterValues.push(filterOptions.propertyfloor);
+  }
+}
+
+  // Add more conditions for other filters
+
+  // Check if minPrice is provided
+  if (filterOptions.minPrice !== undefined && filterOptions.minPrice !== null) {
+    filterConditions.push(`property_price >= ${filterOptions.minPrice}`);
+    filterValues.push(filterOptions.minPrice);
+  }
+
+  // Check if maxPrice is provided
+  if (filterOptions.maxPrice !== undefined && filterOptions.maxPrice !== null) {
+    filterConditions.push(`property_price <= ${filterOptions.maxPrice}`);
+    filterValues.push(filterOptions.maxPrice);
+  }
+
+  // check if garden provided
+  if (filterOptions.propertygarden) {
+    filterConditions.push(`property_isGarden = '${filterOptions.propertygarden}'`);
+    filterValues.push(filterOptions.propertygarden);
+  }
+
+  //check if parking provided
+  if (filterOptions.propertyparking) {
+    filterConditions.push(`property_isParking = '${filterOptions.propertyparking}'`);
+    filterValues.push(filterOptions.propertyparking);
+  }
+
+  //check if parking provided
+  if (filterOptions.propertyfurnished) {
+    filterConditions.push(`property_isFurnished = '${filterOptions.propertyfurnished}'`);
+    filterValues.push(filterOptions.propertyfurnished);
+  }
+
+  //check for availability
+  if (filterOptions.propertyavailability) {
+    filterConditions.push(`property_isAvailable = '${filterOptions.propertyavailability}'`);
+    filterValues.push(filterOptions.propertyavailability);
+  }
+
+  if (filterOptions.propertyname) {
+    filterConditions.push(`property_name LIKE '%${filterOptions.propertyname}%'`);
+    filterValues.push(filterOptions.propertyname);
+  }
+
+  if (filterOptions.propertycity) {
+    filterConditions.push(`property_city LIKE  '%${filterOptions.propertycity}%'`);
+    filterValues.push(filterOptions.propertycity);
+  }
+
+  // Construct the WHERE clause based on the filter conditions
+  const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
+
+  // Construct the SQL query with pagination and filtering
+  const sqlQuery = `
+    SELECT
+      property.*,
+      GROUP_CONCAT(property_image.image_url) AS pi_name
+    FROM
+      property
+    LEFT JOIN
+      property_image ON property.property_id = property_image.property_id
+    ${whereClause}
+    GROUP BY
+      property.property_id
+    ORDER BY
+      property.property_id
+    LIMIT ?, ?;`;
+
+    console.log(`sql query is ${sqlQuery}`);
+
+  // Combine filter values and pagination values                      ...filterValues,
+  const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
+
+  // Execute the SQL query
+  conn.query(sqlQuery, queryValues, (selectError, selectResult) => {
+    if (selectError) {
+      return callback(selectError);
+    }
+
+    // Iterate through the result rows
+    selectResult.forEach(row => {
+      // Check if pi_name is not null
+      if (row.pi_name) {
+        // Split the pi_name string into an array
+        row.pi_name = row.pi_name.split(',');
+      } else {
+        // Set pi_name to an empty array if there are no images
+        row.pi_name = [];
+      }
+    });
+
+    console.log(selectResult);
+    return callback(null, selectResult);
+  });
+}
+
 function fetchSinglePropertyById(p_id){
 
   return new Promise((resolve, reject) => {
@@ -517,27 +649,80 @@ function requestVisit(data, callback){
      });
 
 }
-function fetchVisitRequestedList(data,callback){
+
+function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback){
+    
+      const filterConditions = [];
+      const filterValues = [];
+       // Check if propertybhk is provided
+    if (filterOptions.requestStatus !== undefined && filterOptions.requestStatus !== null) {
+        if (filterOptions.requestStatus === 4) {
+
+          // Include less than 4 bhk
+          filterConditions.push(`v_status <= ${filterOptions.requestStatus}`);
+        
+        } else {
+        
+          // Include specific request status
+          filterConditions.push(`v_status = ${filterOptions.requestStatus}`);
+        
+        }
+      }
+
+      if (data.c_id !== undefined && data.c_id !== null) {
+          // Include specific request status
+          filterConditions.push(`visit.customer_id = ${data.c_id}`);
+        
+      }
+
+
+      // Construct the WHERE clause based on the filter conditions
+      const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
+      // Add ORDER BY, LIMIT, and OFFSET clauses for pagination
+      const orderByClause = `ORDER BY visit.v_date DESC`;
+
+      // Define pagination options
+    const { page, limit } = paginationOptions;
+    const offset = (page - 1) * limit;
+    const limitOffsetClause = `LIMIT ${limit} OFFSET ${offset}`;
+
+    const sqlQuery = `
+        SELECT
+          property.*,
+          visit.v_status,
+          visit.v_date,
+          GROUP_CONCAT(property_image.image_url) AS pi_name
+        FROM
+          property
+        JOIN
+          visit ON property.property_id = visit.property_id
+        LEFT JOIN
+          property_image ON property.property_id = property_image.property_id
+         ${whereClause}
+         GROUP BY
+            property.property_id, visit.v_id
+         ${orderByClause}
+         ${limitOffsetClause}
+    ` ;
+    
   conn.query(
-     `SELECT
-     property.*,
-     visit.v_status,
-     GROUP_CONCAT(property_image.image_url) AS pi_name
- FROM
-     property
- JOIN
-     visit ON property.property_id = visit.property_id
- LEFT JOIN
-     property_image ON property.property_id = property_image.property_id
- WHERE
-     visit.customer_id = ?
- GROUP BY
-     property.property_id, visit.v_id`,
-     [data.c_id],
+     sqlQuery,
+     [],
      (selectErr,selectRes)=>{
       if(selectErr){
         return callback(selectErr);
       }
+      // Iterate through the result rows
+    selectRes.forEach(row => {
+      // Check if pi_name is not null
+      if (row.pi_name) {
+        // Split the pi_name string into an array
+        row.pi_name = row.pi_name.split(',');
+      } else {
+        // Set pi_name to an empty array if there are no images
+        row.pi_name = [];
+      }
+    });
       return callback(null,selectRes);
      }
   );
@@ -567,6 +752,7 @@ module.exports = {
 
 
   fetchAllProperties, 
+  fetchAllPropertiesWithPaginationAndFilter,
   fetchSinglePropertyById,
   submitPropertyRating,
   fetchOfferList,
