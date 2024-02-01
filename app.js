@@ -6,16 +6,8 @@ const express = require('express');
 const app = express();
 
 
-// Configure CORS
-const corsOptions = {
-  origin: ['http://127.0.0.1:5000', 'http://www.yandkbuildcon.com', 'http://54.82.47.83:5000'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-};
-
 //=====================================CONFIGURE EXPRESS
-// app.use(cors()); //chatgpt
-app.use(cors(corsOptions));
+app.use(cors()); //chatgpt
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
 
