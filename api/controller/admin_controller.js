@@ -28,7 +28,7 @@ function sendOtpForAdminLogin(req, res) {
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while send otp admin',
-         error:''
+         error:error
        });
      });
 }
@@ -59,7 +59,7 @@ function verifyOtpForAdminLogin(req, res) {
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while verifying otp',
-         error:''
+         error:error
        });
      });
 }
@@ -82,7 +82,7 @@ function adminProfile(req, res){
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while fetching admin profile',
-         error:''
+         error:error
        });
      });
 } 
@@ -106,7 +106,7 @@ function insertAdminContact(req,res){
           {
              success:false,
              message:"error inserting contact",
-             error:''
+             error:error
           }
        )
      });
@@ -133,7 +133,7 @@ function uploadOffer(req,res){
             {
                success:false,
                message:"error uploading offer image",
-               error:''
+               error:error
             }
          )
        });
@@ -159,7 +159,7 @@ function fetchCustomerRequest(req,res){
             {
                success:false,
                message:"error fetching customer request",
-               error:''
+               error:error
             }
          )
        });
@@ -174,7 +174,7 @@ function insertPropertyDetails(req,res){
            return res.status(500).json({
                success:false,
                message:"something went wrong while inserting property details",
-               error:''
+               error:error
            })
         }
         if (result.message) {
@@ -205,7 +205,7 @@ function uploadPropertyImage(req,res){
           return res.status(500).json({
               success:false,
               message:"something went wrong while uploading property image",
-              error:''
+              error:error
           })
        }
        return res.status(200).json({
@@ -227,7 +227,7 @@ function deletePropertyImage(req,res){
           return res.status(500).json({
               success:false,
               message:"something went wrong while deleting property image",
-              error:''
+              error:error
           })
        }
        return res.status(200).json({
@@ -256,7 +256,7 @@ function changeVisitStatus(req,res){
         {
            success:false,
            message:"error changing status",
-           error:''
+           error:error
         }
      )
    });
