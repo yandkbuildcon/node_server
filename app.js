@@ -107,8 +107,8 @@ app.use((req, res) => {
 // ---------------------------------------------------------------------------
 
 const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/api.yandkbuildcon.com/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/api.yandkbuildcon.com/fullchain.pem'),
+  key: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/fullchain.pem'),
 };
 
 const server = https.createServer(options, app);
