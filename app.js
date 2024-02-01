@@ -11,8 +11,11 @@ app.use(cors()); //chatgpt
 app.use(express.json());
 app.use('/uploads',express.static('uploads'));
 
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> 5a983501506d597b61f667aa19bd8a7f10690588
 //===============================================router imported
 
 const customerRouter = require('./api/router/customer_router');
@@ -21,6 +24,7 @@ const adminRouter = require('./api/router/admin_router');
 //===============================================point endpoint router
 app.use('/api/customer', customerRouter);
 app.use('/api/admin', adminRouter);
+
 
 
 //=========================================accessing property images
