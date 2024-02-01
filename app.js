@@ -2,6 +2,8 @@
 require('dotenv').config();
 const path = require('path');
 const cors = require('cors'); // chatgpt
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const app = express();
 
@@ -106,6 +108,16 @@ app.use((req, res) => {
 
 // -------------------------------------------webpage end
 
+
+// ---------------------------------------------------------------------------
+
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/api.yandkbuildcon.com/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/api.yandkbuildcon.com/fullchain.pem'),
+};
+
+const app = https.createServer(options, app);
+// ---------------------------------------------------------------------------
 
 
 
