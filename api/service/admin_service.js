@@ -134,7 +134,28 @@ function uploadOffer(offerImage, text1, text2, text3, p_id){
           }
       );
   });
-  }
+}
+
+function deleteOffer(data, callback){
+
+  conn.query(
+    `DELETE FROM offer WHERE property_id = ?`,
+    [
+        data.p_id,
+    ],
+    (deleteError, deleteResult) => {
+        if (deleteError) {
+            return callback(deleteError);
+        }
+        // Delete the image file from the uploads folder
+        fs.unlinkSync(`storage/offerImages/${data.offerImage}`);
+        return callback(null, deleteResult);
+    }
+
+);
+
+
+}  
 
 function fetchCustomerRequest(filterOptions, paginationOptions){
      // Define the filter conditions
@@ -263,6 +284,25 @@ function insertPropertyDetails(data, callback) {
   );
 }
 
+function changePropertyAvailability(data){
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    conn.query(
+        `UPDATE property SET property_isAvailable = ? WHERE property_id = ?`,
+        [
+          data.newStatus,
+          data.p_id,
+        ],
+        (updateError, updateResult) => {
+            if (updateError) {
+                reject(updateError);
+            }
+            resolve(updateResult); 
+        }
+    );
+});
+}
+
 function uploadPropertyImage(p_id, propertyImage, callback){
 
     conn.query(
@@ -307,12 +347,13 @@ function changeVisitStatus(data){
     return new Promise((resolve, reject) => {
         conn.query(
           `
-          UPDATE visit SET v_status = ? WHERE customer_id = ? AND property_id = ?;
+          UPDATE visit SET v_status = ? WHERE customer_id = ? AND property_id = ? AND v_id = ?;
           `,
           [
             data.newStatus,
             data.c_id,
-            data.p_id
+            data.p_id,
+            data.v_id
         ],
           (updateError, updateResult) => {
             if (updateError) {
@@ -324,6 +365,48 @@ function changeVisitStatus(data){
       });
 }
 
+function fetchAllCustomerList(filterOptions,paginationOptions){
+   
+   const filterConditions = [];
+ 
+ 
+   if (filterOptions.customer_name) {
+    filterConditions.push(`customer_name LIKE '%${filterOptions.customer_name}%'`);
+  }
+
+  if (filterOptions.customer_email) {
+    filterConditions.push(`customer_email LIKE '%${filterOptions.customer_email}%'`);
+  }
+
+  if (filterOptions.customer_mobile) {
+    filterConditions.push(`customer_mobile LIKE '%${filterOptions.customer_mobile}%'`);
+  }
+
+  if (filterOptions.customer_city) {
+    filterConditions.push(`customer_city LIKE '%${filterOptions.customer_city}%'`);
+  }
+ 
+   
+   // Construct the WHERE clause based on the filter conditions
+   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
+
+   
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        select * from customer ${whereClause} LIMIT ?,?;
+        `,
+        [(paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit],
+        (selectError, selectResult) => {
+          if (selectError) {
+            return reject(updateError);
+          }
+          resolve(selectResult);
+        }
+      );
+    });
+}
+
 
 module.exports = {
     sendOtpForAdminLogin,
@@ -333,10 +416,13 @@ module.exports = {
 
 
     insertPropertyDetails,
+    changePropertyAvailability,
     insertAdminContact,
     uploadOffer,
+    deleteOffer,
     fetchCustomerRequest,
     uploadPropertyImage,
     deletePropertyImage,
     changeVisitStatus,
+    fetchAllCustomerList
 }

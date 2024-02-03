@@ -426,6 +426,7 @@ GROUP BY
 
 
 }
+
 function calculateAverage(rating, customerRating) {
   // Convert input values to numbers if they are provided as strings
   const numericRating = parseFloat(rating);
@@ -438,6 +439,7 @@ function calculateAverage(rating, customerRating) {
 
   return (numericRating + numericCustomerRating) / 2;
 }
+
 function submitPropertyRating(data) {
   return new Promise((resolve, reject) => {
     conn.query(
@@ -515,9 +517,6 @@ function submitPropertyRating(data) {
   });
 }
 
-
-
-
 function fetchOfferList(){
   return new Promise((resolve, reject) => {
     // Check if the combination of u_id and s_id already exists
@@ -533,6 +532,24 @@ function fetchOfferList(){
     );
 });
 }
+
+function fetchOffer(data){
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    conn.query(
+        `SELECT * FROM offer WHERE property_id=?`,
+        [data.p_id],
+        (selectError, selectResult) => {
+            if (selectError) {
+                reject(selectError);
+            }
+            resolve(selectResult); 
+        }
+    );
+});
+}
+
+
 function fetchAdminContact(){
 
   return new Promise((resolve, reject)=>{
@@ -556,6 +573,8 @@ function fetchAdminContact(){
 
 
 
+
+
 function addtoFavorite(data, callback){
   conn.query(
     `INSERT INTO favorite_property(customer_id, property_id) VALUES(?,?)`,
@@ -571,6 +590,7 @@ function addtoFavorite(data, callback){
     }
   )
 }
+
 function removeFromFavorite(data,callback){
   conn.query(
     `DELETE FROM favorite_property WHERE customer_id=? AND property_id=?`,
@@ -586,6 +606,7 @@ function removeFromFavorite(data,callback){
     }
   );
 }
+
 function fetchFavoriteProperty(data,callback){
   conn.query(
       `SELECT * FROM favorite_property WHERE property_id=? AND customer_id=?`,
@@ -600,6 +621,7 @@ function fetchFavoriteProperty(data,callback){
          return callback(null, selectResult);
       });
 }
+
 function fetchFavoritePropertyListDetails(data,callback){
     conn.query(
        `SELECT
@@ -625,6 +647,9 @@ function fetchFavoritePropertyListDetails(data,callback){
        }
     );
 }
+
+
+
 
 
 
@@ -690,6 +715,7 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
         SELECT
           property.*,
           visit.v_status,
+          visit.v_id,
           visit.v_date,
           GROUP_CONCAT(property_image.image_url) AS pi_name
         FROM
@@ -704,7 +730,8 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
          ${orderByClause}
          ${limitOffsetClause}
     ` ;
-    
+    console.log(`customer id is : ${data.c_id}`);
+    console.log(sqlQuery);
   conn.query(
      sqlQuery,
      [],
@@ -727,6 +754,7 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
      }
   );
 }
+
 function fetchVisitRequestedPropertyDetails(data, callback){
   conn.query(
     `SELECT * FROM property WHERE property_id = ?`,
@@ -738,6 +766,29 @@ function fetchVisitRequestedPropertyDetails(data, callback){
       return callback(null,selectRes);
     }
   );
+}
+
+function changeVisitStatus(data){
+  console.log(data);
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        UPDATE visit SET v_status = ? WHERE customer_id = ? AND property_id = ? AND v_id = ?;
+        `,
+        [
+          data.newStatus,
+          data.c_id,
+          data.p_id,
+          data.v_id
+      ],
+        (updateError, updateResult) => {
+          if (updateError) {
+            return reject(updateError);
+          }
+          resolve(updateResult);
+        }
+      );
+    });
 }
 
 
@@ -756,6 +807,7 @@ module.exports = {
   fetchSinglePropertyById,
   submitPropertyRating,
   fetchOfferList,
+  fetchOffer,
   fetchAdminContact,
 
 
@@ -768,26 +820,6 @@ module.exports = {
   requestVisit,
   fetchVisitRequestedList,
   fetchVisitRequestedPropertyDetails,
+  changeVisitStatus
 }
 
-
-// `SELECT DISTINCT property.*, property_image.image_url
-//        FROM property
-//        JOIN favorite_property ON property.property_id = favorite_property.property_id
-//        LEFT JOIN property_image ON property.property_id = property_image.property_id
-//        WHERE favorite_property.customer_id = ?`,
-
-
-
-// // If the combination already exists, return a message
-// console.log(selectResult);
-// const rating = selectResult[0]['p_rating'];
-// const ratingCount = selectResult[0]['p_ratingCount'];
-// console.log(rating);
-// console.log(ratingCount);
-// const customerRating = data.rating;
-// console.log(customerRating);
-// const newRatingCount = ratingCount + 1;
-// const newRating = calculateAverage(rating,customerRating);
-// console.log(newRating);
-// console.log(newRatingCount);
