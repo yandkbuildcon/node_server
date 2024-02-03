@@ -295,6 +295,32 @@ function fetchOfferList(req,res){
       )
     });
 }
+function fetchOffer(req,res){
+   const data = req.body;
+   customerService.fetchOffer(data).then((result) => {
+      console.log('offer fetched successfully:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"offer fetched successfully",
+            result:result
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error fetching offers:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error fetching offers",
+            error:error
+         }
+      )
+    });
+}
+
+
+
 function submitPropertyRating(req,res){
    const data = req.body;
    customerService.submitPropertyRating(data).then((result) => {
@@ -451,8 +477,8 @@ function requestVisit(req,res){
    });
 } 
 function fetchVisitRequestedList(req,res){
-   const { filterOptions, paginationOptions } = req.body;
-  const data = req.body;
+   const { filterOptions, paginationOptions, data } = req.body;
+
   customerService.fetchVisitRequestedList(filterOptions,paginationOptions,data,(error,result)=>{
     if(error){
       console.log(error);
@@ -494,6 +520,29 @@ function fetchVisitRequestedPropertyDetails(req,res){
    });
 }
 
+function changeVisitStatus(req,res){
+   const data = req.body;
+   customerService.changeVisitStatus(data).then((result) => {
+      console.log('status changed:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"request cancelled successfully"
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error changing staus:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error changing status",
+            error:error
+         }
+      )
+    });
+ }
+
 
  
   
@@ -513,6 +562,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
   fetchSinglePropertyById,
   submitPropertyRating,
   fetchOfferList,
+  fetchOffer,
   fetchAdminContact,
   
   
@@ -526,6 +576,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
   requestVisit,  
   fetchVisitRequestedList,
   fetchVisitRequestedPropertyDetails,
+  changeVisitStatus
   
 
 }

@@ -18,10 +18,14 @@ adminRouter.post('/uploadOffer', auth.authenticateToken, offerUploads, (req, res
     // Now you can handle additional logic using your adminController
     adminController.uploadOffer(req, res);
   });
+
+adminRouter.post('/deleteOffer', auth.authenticateToken, adminController.deleteOffer);
 adminRouter.post('/fetchCustomerRequest', auth.authenticateToken, adminController.fetchCustomerRequest);
 adminRouter.post('/uploadPropertyImage', auth.authenticateToken, propertyUpload.upload, adminController.uploadPropertyImage);
 adminRouter.post('/deletePropertyImage', auth.authenticateToken, adminController.deletePropertyImage);
 adminRouter.put('/changeVisitStatus', auth.authenticateToken, adminController.changeVisitStatus);
+adminRouter.put('/changePropertyAvailability', auth.authenticateToken, adminController.changePropertyAvailability);
+adminRouter.post('/fetchAllCustomerList', auth.authenticateToken, adminController.fetchAllCustomerList);
 
 
 module.exports = adminRouter;

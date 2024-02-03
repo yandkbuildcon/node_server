@@ -139,6 +139,28 @@ function uploadOffer(req,res){
        });
 }
 
+function deleteOffer(req,res){
+  const data=req.body;
+  adminService.deleteOffer(data , (error,result)=>{
+        
+      if(error){
+          console.log(error);
+          console.log('something went wrong while deleting offers');
+          return res.status(500).json({
+              success:false,
+              message:"something went wrong while deleting offers",
+              error:error
+          })
+       }
+       return res.status(200).json({
+          success:true,
+          message:"offer removed successfully."
+       })
+
+
+  } );
+}
+
 
 function fetchCustomerRequest(req,res){
   const { filterOptions, paginationOptions } = req.body;
@@ -261,16 +283,66 @@ function changeVisitStatus(req,res){
      )
    });
 }
+
+function changePropertyAvailability(req,res){
+  const data = req.body;
+  adminService.changePropertyAvailability(data).then((result) => {
+     console.log('status changed:', result);
+     return res.status(200).json(
+        {
+           success:true,
+           message:"status changed successfully"
+        }
+     )
+   })
+   .catch((error) => {
+     console.error('Error changing staus:', error);
+     return res.status(500).json(
+        {
+           success:false,
+           message:"error changing status",
+           error:error
+        }
+     )
+   });
+}
+
+function fetchAllCustomerList(req,res){
+  const {filterOptions, paginationOptions} = req.body;
+  adminService.fetchAllCustomerList(filterOptions,paginationOptions).then((result) => {
+     console.log('customer list fetched:', result);
+     return res.status(200).json(
+        {
+           success:true,
+           message:"customer fetched successfully",
+           result:result
+        }
+     )
+   })
+   .catch((error) => {
+     console.error('Error fetching customer:', error);
+     return res.status(500).json(
+        {
+           success:false,
+           message:"error fetching customer",
+           error:error
+        }
+     )
+   });
+}
  
 module.exports = {
    sendOtpForAdminLogin,
    verifyOtpForAdminLogin,
    adminProfile,
    insertPropertyDetails,
+   changePropertyAvailability,
    insertAdminContact, 
    uploadOffer,
+   deleteOffer,
    fetchCustomerRequest,
    uploadPropertyImage,
    deletePropertyImage,
-   changeVisitStatus
+   changeVisitStatus,
+   fetchAllCustomerList
 }   

@@ -18,6 +18,7 @@ customerRouter.post('/fetchAllPropertiesWithPaginationAndFilter', customerContro
 customerRouter.post('/fetchSinglePropertyById', customerController.fetchSinglePropertyById);
 customerRouter.post('/submitPropertyRating', auth.authenticateToken, customerController.submitPropertyRating);
 customerRouter.get('/fetchOfferList', customerController.fetchOfferList);
+customerRouter.post('/fetchOffer', customerController.fetchOffer);
 customerRouter.get('/fetchAdminContact', customerController.fetchAdminContact);
 
 
@@ -30,6 +31,7 @@ customerRouter.post('/fetchFavoritePropertyListDetails', auth.authenticateToken,
 customerRouter.post('/requestVisit', auth.authenticateToken, customerController.requestVisit);
 customerRouter.post('/fetchVisitRequestedList', auth.authenticateToken, customerController.fetchVisitRequestedList);
 customerRouter.post('/fetchVisitRequestedPropertyDetails', auth.authenticateToken, customerController.fetchVisitRequestedPropertyDetails);
+customerRouter.put('/cancelRequest', auth.authenticateToken, customerController.changeVisitStatus);
 
 
 
