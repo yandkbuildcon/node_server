@@ -370,25 +370,25 @@ function fetchAllCustomerList(filterOptions,paginationOptions){
    const filterConditions = [];
  
  
-   if (filterOptions.customer_name) {
-    filterConditions.push(`customer_name LIKE '%${filterOptions.customer_name}%'`);
+   if (filterOptions.searchItem) {
+    filterConditions.push(`customer_name LIKE '%${filterOptions.searchItem}%'`);
   }
 
-  if (filterOptions.customer_email) {
-    filterConditions.push(`customer_email LIKE '%${filterOptions.customer_email}%'`);
+  if (filterOptions.searchItem) {
+    filterConditions.push(`customer_email LIKE '%${filterOptions.searchItem}%'`);
   }
 
-  if (filterOptions.customer_mobile) {
-    filterConditions.push(`customer_mobile LIKE '%${filterOptions.customer_mobile}%'`);
+  if (filterOptions.searchItem) {
+    filterConditions.push(`customer_mobile LIKE '%${filterOptions.searchItem}%'`);
   }
 
-  if (filterOptions.customer_city) {
-    filterConditions.push(`customer_city LIKE '%${filterOptions.customer_city}%'`);
+  if (filterOptions.searchItem) {
+    filterConditions.push(`customer_city LIKE '%${filterOptions.searchItem}%'`);
   }
  
    
    // Construct the WHERE clause based on the filter conditions
-   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
+   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' OR ')}` : '';
 
    
   return new Promise((resolve, reject) => {
