@@ -90,7 +90,35 @@ function verifyOtpForSignup(req,res){
 }
 
 
+function updateCustomerDetails(req,res){
+   const data = req.body;
+   customerService.updateCustomerDetails(data,(error,result)=>{
+       if(error){
+           console.log(error);
+           console.log('something went wrong while updating customer details');
+           return res.status(500).json({
+               success:false,
+               message:"something went wrong while updating customer details",
+               error:error
+           })
+        }
+        if (result.message) {
+           console.log(result.message);
+           return res.status(400).json({
+               success: false,
+               message: result.message,
+               error:''
+           });
+       }
+     
+       return res.status(200).json({
+           success:true,
+           message:"user details updated successfully",
+           token:result
+        })
 
+   });
+}
 
 
 function sendOtpForLogin(req, res) {
@@ -551,6 +579,7 @@ function changeVisitStatus(req,res){
   customerSignup, 
   sendOtpForSignup,
   verifyOtpForSignup,
+  updateCustomerDetails,
   sendOtpForLogin, 
   verifyOtpForLogin, 
   customerProfile,
