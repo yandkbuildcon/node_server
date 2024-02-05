@@ -89,6 +89,36 @@ function verifyOtpForSignup(data, callback){
   }
 }
 
+function updateCustomerDetails(data,callback){
+  console.log('update customer methond called');
+  const sqlQuery = `
+  UPDATE customer SET
+  customer_name = '${data.c_name}',
+  customer_mobile = ${data.c_mobile}, 
+  customer_email = '${data.c_email}',
+  customer_address = '${data.c_address}',
+  customer_locality = '${data.c_locality}', 
+  customer_city = '${data.c_city}', 
+  customer_pincode = ${data.c_pincode}
+  WHERE customer_id = ${data.c_id}
+  `;
+  console.log(sqlQuery);
+  conn.query(
+    `
+     ${sqlQuery}
+    `,
+    [],
+    (updateError, updateResult) => {
+        if (updateError) {
+            return callback(updateError);
+        }
+
+        return callback(null, updateResult);
+    }
+);
+}
+
+
 function customerSignup(data, callback) {
     
     // Check if the combination of u_id and s_id already exists
@@ -796,6 +826,7 @@ module.exports = {
   customerSignup, 
   sendOtpForSignup,
   verifyOtpForSignup,
+  updateCustomerDetails,
   sendOtpForLogin, 
   verifyOtpForLogin, 
   customerProfile,
