@@ -6,6 +6,7 @@ const customerUploads = require('../../middleware/customerUploads');
 customerRouter.post('/customerSignup', customerController.customerSignup);
 customerRouter.post('/sendOtpForSignup', customerController.sendOtpForSignup);
 customerRouter.post('/verifyOtpForSignup', customerController.verifyOtpForSignup);
+customerRouter.post('/updateCustomerDetails', auth.authenticateToken, customerController.updateCustomerDetails);
 customerRouter.post('/sendOtpForLogin', customerController.sendOtpForLogin);
 customerRouter.post('/verifyOtpForLogin', customerController.verifyOtpForLogin);
 customerRouter.get('/customerProfile', auth.authenticateToken, customerController.customerProfile);
