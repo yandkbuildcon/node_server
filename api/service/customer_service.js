@@ -398,13 +398,44 @@ if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !==
       property.property_id
     LIMIT ?, ?;`;
 
+
+  const sqlQuery2 = `
+    SELECT
+    property.property_id,
+    property.property_name,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_count, 0) AS review_count
+FROM
+    property
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_counts ON property.property_id = review_counts.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id
+LIMIT ?, ?;
+    `;
+
+  
+
     console.log(`sql query is ${sqlQuery}`);
 
   // Combine filter values and pagination values                      ...filterValues,
   const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
 
   // Execute the SQL query
-  conn.query(sqlQuery, queryValues, (selectError, selectResult) => {
+  conn.query(sqlQuery2, queryValues, (selectError, selectResult) => {
     if (selectError) {
       return callback(selectError);
     }
@@ -428,22 +459,28 @@ if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !==
 
 function fetchSinglePropertyById(p_id){
 
-  return new Promise((resolve, reject) => {
-    // Check if the combination of u_id and s_id already exists
-    conn.query(
-        `
-        SELECT
+   const sqlQuery2 = `
+    SELECT
     property.*,
-    GROUP_CONCAT(property_image.image_url) AS pi_name
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS property_rating,
+    COALESCE(COUNT(review.r_id), 0) AS total_review
 FROM
     property
 LEFT JOIN
     property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
 WHERE
     property.property_id = ?
 GROUP BY
     property.property_id;
-        `,
+    `;
+
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    conn.query(
+        `${sqlQuery2}`,
         [p_id],
         (selectError, selectResult) => {
             if (selectError) {
@@ -492,7 +529,7 @@ function submitPropertyRating(data) {
           // Update the review with or without feedback
           const updateQuery = `
             UPDATE review 
-            SET r_rating = ${global.newRating}, r_detail = ${data.feedback ? `'${data.feedback}'` : 'NULL'} 
+            SET r_rating = ${data.rating}, r_detail = ${data.feedback ? `'${data.feedback}'` : 'NULL'} 
             WHERE customer_id = ${data.c_id} AND property_id = ${data.p_id}`;
 
           conn.query(updateQuery, [], (updateErr, updateResult) => {
@@ -500,20 +537,7 @@ function submitPropertyRating(data) {
               reject(updateErr);
               return;
             }
-
-            // Update the rating and rating count in the properties table
-            conn.query(
-              `UPDATE property SET property_rating = ?, property_ratingCount = (SELECT COUNT(*) FROM review WHERE property_id = ?) WHERE property_id = ?`,
-              [global.newRating, data.p_id, data.p_id],
-              (propertyUpdateErr, propertyUpdateResult) => {
-                if (propertyUpdateErr) {
-                  reject(propertyUpdateErr);
-                  return;
-                }
-
-                resolve(propertyUpdateResult);
-              }
-            );
+            resolve(updateResult);
           });
         } else {
           // Insert a new review record
@@ -525,20 +549,7 @@ function submitPropertyRating(data) {
                 reject(insertErr);
                 return;
               }
-
-              // Update the rating and rating count in the properties table
-              conn.query(
-                `UPDATE property SET property_rating = ?, property_ratingCount = (SELECT COUNT(*) FROM review WHERE property_id = ?) WHERE property_id = ?`,
-                [data.rating, data.p_id, data.p_id],
-                (propertyUpdateErr, propertyUpdateResult) => {
-                  if (propertyUpdateErr) {
-                    reject(propertyUpdateErr);
-                    return;
-                  }
-
-                  resolve(propertyUpdateResult);
-                }
-              );
+              resolve(insertResult);
             }
           );
         }
