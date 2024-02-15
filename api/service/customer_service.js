@@ -29,8 +29,8 @@ function sendOtpForSignup(data){
         otpCache.set(data.c_email, { otp, expirationTime });
         const otpData = otpCache.get(data.c_email);
 
-        console.log(otpData.otp);
-        console.log(otpData.expirationTime);
+        //console.log(otpData.otp);
+        //console.log(otpData.expirationTime);
 
         mailer
           .sendEmail(data.c_email, 'signup verification code', `Your Signup verification code is: ${otp}`)
@@ -52,11 +52,11 @@ function sendOtpForSignup(data){
 
 function verifyOtpForSignup(data, callback){
   const otpData = otpCache.get(data.c_email);
-  console.log(otpData.otp);
+  //console.log(otpData.otp);
 
   if (otpData.otp === data.c_otp){
       const currentTime = Date.now();
-      console.log('valid otp');
+      //console.log('valid otp');
       if(currentTime<= otpData.expirationTime){
           // Check if the combination of u_id and s_id already exists
      // If the combination does not exist, insert the record
@@ -90,7 +90,11 @@ function verifyOtpForSignup(data, callback){
 }
 
 function updateCustomerDetails(data,callback){
+
+  //console.log('update customer methond called');
+
   console.log('update customer methond called');
+
   const sqlQuery = `
   UPDATE customer SET
   customer_name = '${data.c_name}',
@@ -102,7 +106,11 @@ function updateCustomerDetails(data,callback){
   customer_pincode = ${data.c_pincode}
   WHERE customer_id = ${data.c_id}
   `;
+
+  //console.log(sqlQuery);
+
   console.log(sqlQuery);
+
   conn.query(
     `
      ${sqlQuery}
@@ -117,6 +125,9 @@ function updateCustomerDetails(data,callback){
     }
 );
 }
+
+
+
 
 
 function customerSignup(data, callback) {
@@ -185,8 +196,8 @@ function sendOtpForLogin(data) {
           otpCache.set(data.c_email, { otp, expirationTime });
           const otpData = otpCache.get(data.c_email);
   
-          console.log(otpData.otp);
-          console.log(otpData.expirationTime);
+          //console.log(otpData.otp);
+          //console.log(otpData.expirationTime);
   
           mailer
             .sendEmail(data.c_email, 'login otp', `Your login OTP is: ${otp}`)
@@ -207,15 +218,15 @@ function sendOtpForLogin(data) {
 }
 function verifyOtpForLogin(data, callback){
     const otpData = otpCache.get(data.c_email);
-    console.log(otpData.otp);
+    //console.log(otpData.otp);
 
     if (otpData.otp === data.c_otp){
         const currentTime = Date.now();
-        console.log('valid otp');
+       // console.log('valid otp');
         if(currentTime<= otpData.expirationTime){
             const token = auth.generateAccessToken(data.c_email);
-            console.log('authenticated otp');
-            console.log(token);
+         //   console.log('authenticated otp');
+          //  console.log(token);
             callback(null, token );
 
         }else{
@@ -280,14 +291,14 @@ function fetchAllProperties(callback){
           if (selectError) {
               return callback(selectError);
           }
-          console.log(selectResult);
+        //  console.log(selectResult);
           if (selectResult && selectResult.pi_name) {
               selectResult.pi_name = selectResult.pi_name.split(',');
             } else {
               // Set pi_name to null or an empty array if there are no images
               selectResult.pi_name = []; // or an empty array []
             }
-          console.log(selectResult);
+          //console.log(selectResult);
           return callback(null, selectResult);
       }
 
@@ -297,8 +308,8 @@ function fetchAllProperties(callback){
 //===========================================fetch all proeprty by pegination
 function fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOptions, callback) {
   // Define the filter conditions
-  console.log(`filter option is ${filterOptions.propertytype}`);
-  console.log(`pegination option is ${paginationOptions}`);
+  //console.log(`filter option is ${filterOptions.propertytype}`);
+  //console.log(`pegination option is ${paginationOptions}`);
   const filterConditions = [];
   const filterValues = [];
 
@@ -306,6 +317,36 @@ function fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOpti
     filterConditions.push(`property_type = '${filterOptions.propertytype}'`);
     filterValues.push(filterOptions.propertytype);
   }
+
+
+
+      // Check if project id is provided
+if (filterOptions.propertyUn !== undefined && filterOptions.propertyUn !== null) {
+  if (filterOptions.propertyUn === 0) {
+    // Include 0 bhk and greater than 0 bhk
+    filterConditions.push(`property.property_un >= ${0}`);
+  } else {
+    // Include specific bhk
+    filterConditions.push(`property.property_un = ${filterOptions.propertyUn}`);
+    filterValues.push(filterOptions.propertyUn);
+  }
+}
+
+
+
+    // Check if project id is provided
+if (filterOptions.projectId !== undefined && filterOptions.projectId !== null) {
+  if (filterOptions.projectId === 0) {
+    // Include 0 bhk and greater than 0 bhk
+    filterConditions.push(`property.project_id >= ${0}`);
+  } else {
+    // Include specific bhk
+    filterConditions.push(`property.project_id = ${filterOptions.projectId}`);
+    filterValues.push(filterOptions.projectId);
+  }
+}
+
+
 
   // Check if propertybhk is provided
 if (filterOptions.propertybhk !== undefined && filterOptions.propertybhk !== null) {
@@ -384,20 +425,67 @@ if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !==
 
   // Construct the SQL query with pagination and filtering
   const sqlQuery = `
-    SELECT
-      property.*,
-      GROUP_CONCAT(property_image.image_url) AS pi_name
-    FROM
-      property
-    LEFT JOIN
-      property_image ON property.property_id = property_image.property_id
-    ${whereClause}
-    GROUP BY
-      property.property_id
-    ORDER BY
-      property.property_id
-    LIMIT ?, ?;`;
+  SELECT
+    property.property_id,
+    property.property_name,
+    property.property_un,
+    property.property_isAvailable,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_counts.review_count, 0) AS review_count
+FROM
+    property
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_counts ON property.property_id = review_counts.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id LIMIT ?,?;
+    `;
 
+    const sqlQuery2 = `
+    SELECT
+    property.property_id,
+    property.property_name,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_count, 0) AS review_count
+FROM
+    property
+
+LEFT JOIN
+    major_project ON property.project_id = major_project.project_id    
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id        
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_count ON property.property_id = review_count.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id
+LIMIT ?, ?;
+    `;
+
+
+    //console.log(`sql query is ${sqlQuery}`);
 
   const sqlQuery2 = `
     SELECT
@@ -452,14 +540,20 @@ LIMIT ?, ?;
       }
     });
 
-    console.log(selectResult);
+    //console.log(selectResult);
     return callback(null, selectResult);
   });
 }
 
 function fetchSinglePropertyById(p_id){
 
-   const sqlQuery2 = `
+
+ // console.log(`property id is ${p_id}`);
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    const sqlQuery2 = `
+    const sqlQuery2 = `
+
     SELECT
     property.*,
     GROUP_CONCAT(property_image.image_url) AS pi_name,
@@ -486,6 +580,19 @@ GROUP BY
             if (selectError) {
                 reject(selectError);
             }
+           // console.log(selectResult);
+            // Iterate through the result rows
+    selectResult.forEach(row => {
+      // Check if pi_name is not null
+      if (row.pi_name) {
+        // Split the pi_name string into an array
+        row.pi_name = row.pi_name.split(',');
+      } else {
+        // Set pi_name to an empty array if there are no images
+        row.pi_name = [];
+      }
+    });
+
             resolve(selectResult); 
         }
     );
@@ -679,12 +786,22 @@ function fetchFavoritePropertyListDetails(data,callback){
    GROUP BY
        property.property_id;`,
        [data.c_id],
-       (selectErr,selectRes)=>{
-        if(selectErr){
-          return callback(selectErr);
+       (selectError,selectResult)=>{
+        if(selectError){
+          return callback(selectError);
         }
-        console.log(selectRes);
-        return callback(null,selectRes);
+        selectResult.forEach(row => {
+          // Check if pi_name is not null
+          if (row.pi_name) {
+            // Split the pi_name string into an array
+            row.pi_name = row.pi_name.split(',');
+          } else {
+            // Set pi_name to an empty array if there are no images
+            row.pi_name = [];
+          }
+        });
+        //(selectRes);
+        return callback(null,selectResult);
        }
     );
 }
@@ -771,8 +888,8 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
          ${orderByClause}
          ${limitOffsetClause}
     ` ;
-    console.log(`customer id is : ${data.c_id}`);
-    console.log(sqlQuery);
+    //console.log(`customer id is : ${data.c_id}`);
+    //console.log(sqlQuery);
   conn.query(
      sqlQuery,
      [],
@@ -810,7 +927,7 @@ function fetchVisitRequestedPropertyDetails(data, callback){
 }
 
 function changeVisitStatus(data){
-  console.log(data);
+  //console.log(data);
   return new Promise((resolve, reject) => {
       conn.query(
         `
@@ -830,6 +947,23 @@ function changeVisitStatus(data){
         }
       );
     });
+}
+
+
+function fetchBlog(paginationOptions){
+  const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
+  return new Promise((resolve, reject) => {
+    conn.query(
+      `SELECT * FROM blog LIMIT ?`,
+      [queryValues],
+      (selectError, selectResult) => {
+        if (selectError) {
+          return reject(selectError);
+        }
+        resolve(selectResult);
+      }
+    );
+  });
 }
 
 
@@ -862,6 +996,7 @@ module.exports = {
   requestVisit,
   fetchVisitRequestedList,
   fetchVisitRequestedPropertyDetails,
-  changeVisitStatus
+  changeVisitStatus,
+  fetchBlog
 }
 

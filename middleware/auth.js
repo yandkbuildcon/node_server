@@ -11,7 +11,7 @@ function authenticateToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    return res.status(401).send({ success:false, message: 'No token provided' });
+    return res.status(401).send({ success:false, message: 'No token provided',error:'' });
   }
 
   try {
@@ -20,7 +20,7 @@ function authenticateToken(req, res, next) {
     console.log(req.user.email); // Optional logging
     next();
   } catch (error) {
-    res.status(401).json({ success:false ,message: 'Invalid token' });
+    res.status(401).json({ success:false ,message: 'Invalid token', error:'' });
   }
 }
 

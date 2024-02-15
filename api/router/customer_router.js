@@ -3,6 +3,7 @@ const customerController = require('../controller/customer_controller');
 const auth = require('../../middleware/auth');
 const customerUploads = require('../../middleware/customerUploads');
 
+
 customerRouter.post('/customerSignup', customerController.customerSignup);
 customerRouter.post('/sendOtpForSignup', customerController.sendOtpForSignup);
 customerRouter.post('/verifyOtpForSignup', customerController.verifyOtpForSignup);
@@ -33,6 +34,7 @@ customerRouter.post('/requestVisit', auth.authenticateToken, customerController.
 customerRouter.post('/fetchVisitRequestedList', auth.authenticateToken, customerController.fetchVisitRequestedList);
 customerRouter.post('/fetchVisitRequestedPropertyDetails', auth.authenticateToken, customerController.fetchVisitRequestedPropertyDetails);
 customerRouter.put('/cancelRequest', auth.authenticateToken, customerController.changeVisitStatus);
+customerRouter.post('/fetchBlog', customerController.fetchBlog);
 
 
 

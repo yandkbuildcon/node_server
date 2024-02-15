@@ -31,10 +31,12 @@ app.use((req, res, next) => {
 
 const customerRouter = require('./api/router/customer_router');
 const adminRouter = require('./api/router/admin_router');
+const employeeRouter = require('./api/router/employee_router');
 
 //===============================================point endpoint router
 app.use('/api/customer', customerRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/employee', employeeRouter);
 
 
 

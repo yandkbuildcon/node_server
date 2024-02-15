@@ -214,6 +214,81 @@ function insertPropertyDetails(req,res){
       });
 }
 
+function insertProjectDetails(req,res){
+   const data = req.body;
+   adminService.insertProjectDetails(data,(error,result)=>{
+     if(error){
+        console.log(error);
+        console.log('something went wrong while inserting project details');
+        return res.status(500).json({
+            success:false,
+            message:"something went wrong while inserting project details",
+            error:error
+        })
+     }
+     if (result.message) {
+        console.log(result.message);
+        return res.status(400).json({
+            success: false,
+            message: result.message,
+            error:''
+        });
+    }
+     return res.status(200).json({
+        success:true,
+        message:"project added successfully."
+     })
+   });
+}
+
+function fetchProject(req,res){
+   adminService.fetchProject().then((result) => {
+      console.log('project fetched:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"project fetched successfully",
+            result:result
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error fetching project:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error fetching project",
+            error:error
+         }
+      )
+    });
+}
+
+function fetchProjectWithPagination(req,res){
+   const {filterOptions, paginationOptions} = req.body;
+   adminService.fetchProjectWithPagination(filterOptions,paginationOptions).then((result) => {
+      console.log('project list fetched:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"project list fetched successfully",
+            result:result
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error fetching project:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error fetching project",
+            error:error
+         }
+      )
+    });
+ }
+
+
 function uploadPropertyImage(req,res){
   const p_id = req.body.p_id;
   console.log(p_id);
@@ -330,12 +405,62 @@ function fetchAllCustomerList(req,res){
      )
    });
 }
+
+function fetchAllEmployeeList(req,res){
+   const {filterOptions, paginationOptions} = req.body;
+   adminService.fetchAllEmployeeList(filterOptions,paginationOptions).then((result) => {
+      console.log('employee list fetched:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"employee fetched successfully",
+            result:result
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error fetching employee:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error fetching employee",
+            error:error
+         }
+      )
+    });
+ }
+
+function postBlog(req,res){
+   const data = req.body;
+   adminService.postBlog(data).then((result) => {
+      console.log('blog posted:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"blog posted successfully"
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error while posting blog:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error while posting blog",
+            error:error
+         }
+      )
+    });
+ }
  
 module.exports = {
    sendOtpForAdminLogin,
    verifyOtpForAdminLogin,
    adminProfile,
    insertPropertyDetails,
+   insertProjectDetails,
+   fetchProject,
+   fetchProjectWithPagination,
    changePropertyAvailability,
    insertAdminContact, 
    uploadOffer,
@@ -344,5 +469,7 @@ module.exports = {
    uploadPropertyImage,
    deletePropertyImage,
    changeVisitStatus,
-   fetchAllCustomerList
+   fetchAllCustomerList,
+   fetchAllEmployeeList,
+   postBlog
 }   

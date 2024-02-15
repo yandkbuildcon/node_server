@@ -5,8 +5,8 @@ function customerSignup(req,res){
     const data = req.body;
     customerService.customerSignup(data,(error,result)=>{
       if(error){
-         console.log(error);
-         console.log('something went wrong while signup customer');
+         //console.log(error);
+         //console.log('something went wrong while signup customer');
          return res.status(500).json({
              success:false,
              message:"something went wrong while signup customer",
@@ -14,7 +14,7 @@ function customerSignup(req,res){
          })
       }
       if (result.message) {
-         console.log(result.message);
+         //console.log(result.message);
          return res.status(400).json({
              success: false,
              message: result.message,
@@ -50,7 +50,7 @@ function sendOtpForSignup(req, res) {
      })
      .catch((error) => {
        console.error(error);
-       console.log('Something went wrong while signup customer');
+       //console.log('Something went wrong while signup customer');
        return res.status(500).json({
          success: false,
          message: 'Something went wrong while signup customer',
@@ -63,8 +63,8 @@ function verifyOtpForSignup(req,res){
    const data = req.body;
    customerService.verifyOtpForSignup(data,(error,result)=>{
        if(error){
-           console.log(error);
-           console.log('something went wrong while verify otp');
+           //console.log(error);
+           //console.log('something went wrong while verify otp');
            return res.status(500).json({
                success:false,
                message:"something went wrong while verify otp",
@@ -72,7 +72,7 @@ function verifyOtpForSignup(req,res){
            })
         }
         if (result.message) {
-           console.log(result.message);
+           //console.log(result.message);
            return res.status(400).json({
                success: false,
                message: result.message,
@@ -94,8 +94,13 @@ function updateCustomerDetails(req,res){
    const data = req.body;
    customerService.updateCustomerDetails(data,(error,result)=>{
        if(error){
-           console.log(error);
+
+           //console.log(error);
+           //console.log('something went wrong while updating customer details');
+
+         console.log(error);
            console.log('something went wrong while updating customer details');
+
            return res.status(500).json({
                success:false,
                message:"something went wrong while updating customer details",
@@ -103,7 +108,12 @@ function updateCustomerDetails(req,res){
            })
         }
         if (result.message) {
+
+           
+         ///console.log(result.message);
+
            console.log(result.message);
+
            return res.status(400).json({
                success: false,
                message: result.message,
@@ -121,6 +131,10 @@ function updateCustomerDetails(req,res){
 }
 
 
+   });
+}
+
+
 function sendOtpForLogin(req, res) {
     const data = req.body;
   
@@ -128,7 +142,7 @@ function sendOtpForLogin(req, res) {
       .sendOtpForLogin(data)
       .then((result) => {
         if (result.message) {
-          console.log(result.message);
+          //console.log(result.message);
           return res.status(400).json({
             success: false,
             message: result.message,
@@ -143,7 +157,7 @@ function sendOtpForLogin(req, res) {
       })
       .catch((error) => {
         console.error(error);
-        console.log('Something went wrong while signup customer');
+        //console.log('Something went wrong while signup customer');
         return res.status(500).json({
           success: false,
           message: 'Something went wrong while signup customer',
@@ -155,8 +169,8 @@ function verifyOtpForLogin(req,res){
     const data = req.body;
     customerService.verifyOtpForLogin(data,(error,result)=>{
         if(error){
-            console.log(error);
-            console.log('something went wrong while verify otp');
+            //console.log(error);
+            //console.log('something went wrong while verify otp');
             return res.status(500).json({
                 success:false,
                 message:"something went wrong while verify otp",
@@ -164,7 +178,7 @@ function verifyOtpForLogin(req,res){
             })
          }
          if (result.message) {
-            console.log(result.message);
+            //console.log(result.message);
             return res.status(400).json({
                 success: false,
                 message: result.message,
@@ -184,15 +198,15 @@ function customerProfile(req,res){
     const c_email= req.user.email;
     customerService.customerProfile(c_email, (error,result)=>{
         if(error){
-            console.log(error);
-            console.log('something went wrong while signup customer');
+            //console.log(error);
+            //console.log('something went wrong while signup customer');
             return res.status(500).json({
                 success:false,
                 message:"something went wrong while signup customer",
                 error:error
             })
          }
-         console.log(result);
+         //console.log(result);
          return res.status(200).json({
             success:true,
             result:result
@@ -203,9 +217,9 @@ function customerProfile(req,res){
 function uploadProfilePic(req,res){
    const c_id = req.body.c_id;
    const profilePic = req.file.filename;
-   console.log(c_id, profilePic);
+   //console.log(c_id, profilePic);
    customerService.uploadProfilePic(c_id, profilePic).then((result) => {
-      console.log('profile pic uploaded successfully:', result);
+      //console.log('profile pic uploaded successfully:', result);
       return res.status(200).json(
          {
             success:true,
@@ -214,7 +228,7 @@ function uploadProfilePic(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error uploading profile pic:', error);
+      //console.error('Error uploading profile pic:', error);
       return res.status(500).json(
          {
             success:false,
@@ -235,8 +249,8 @@ function fetchAllProperties(req,res){
    customerService.fetchAllProperties((error,result)=>{
          
        if(error){
-           console.log(error);
-           console.log('something went wrong while fetching properties');
+           //console.log(error);
+          // console.log('something went wrong while fetching properties');
            return res.status(500).json({
                success:false,
                message:"something went wrong while fetching properties",
@@ -259,14 +273,15 @@ function fetchAllPropertiesWithPaginationAndFilter(req,res){
    customerService.fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOptions,(error,result)=>{
          
        if(error){
-           console.log(error);
-           console.log('something went wrong while fetching properties');
+          //console.log(error);
+          // console.log('something went wrong while fetching properties');
            return res.status(500).json({
                success:false,
                message:"something went wrong while fetching properties",
                error:error
            })
         }
+        //console.log(result);
         return res.status(200).json({
            success:true,
            message:"property successfully fetched.",
@@ -281,7 +296,7 @@ function fetchAllPropertiesWithPaginationAndFilter(req,res){
 function fetchSinglePropertyById(req,res){
    const p_id = req.body.p_id;
    customerService.fetchSinglePropertyById(p_id).then((result) => {
-      console.log('property fetched:', result);
+      //console.log('property fetched:', result);
       return res.status(200).json(
          {
             success:true,
@@ -291,7 +306,7 @@ function fetchSinglePropertyById(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error fetching property:', error);
+     // console.error('Error fetching property:', error);
       return res.status(500).json(
          {
             success:false,
@@ -303,7 +318,7 @@ function fetchSinglePropertyById(req,res){
 }
 function fetchOfferList(req,res){
    customerService.fetchOfferList().then((result) => {
-      console.log('offer fetched successfully:', result);
+     // console.log('offer fetched successfully:', result);
       return res.status(200).json(
          {
             success:true,
@@ -313,7 +328,7 @@ function fetchOfferList(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error fetching offers:', error);
+     // console.error('Error fetching offers:', error);
       return res.status(500).json(
          {
             success:false,
@@ -326,7 +341,7 @@ function fetchOfferList(req,res){
 function fetchOffer(req,res){
    const data = req.body;
    customerService.fetchOffer(data).then((result) => {
-      console.log('offer fetched successfully:', result);
+     // console.log('offer fetched successfully:', result);
       return res.status(200).json(
          {
             success:true,
@@ -336,7 +351,7 @@ function fetchOffer(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error fetching offers:', error);
+     // console.error('Error fetching offers:', error);
       return res.status(500).json(
          {
             success:false,
@@ -352,7 +367,7 @@ function fetchOffer(req,res){
 function submitPropertyRating(req,res){
    const data = req.body;
    customerService.submitPropertyRating(data).then((result) => {
-      console.log('Rating submitted successfully:', result);
+      //console.log('Rating submitted successfully:', result);
       return res.status(200).json(
          {
             success:true,
@@ -361,7 +376,7 @@ function submitPropertyRating(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error submitting rating:', error);
+      //console.error('Error submitting rating:', error);
       return res.status(500).json(
          {
             success:false,
@@ -373,7 +388,7 @@ function submitPropertyRating(req,res){
 }  
 function fetchAdminContact(req,res){
    customerService.fetchAdminContact().then((result) => {
-      console.log('contact fetched:', result);
+      //console.log('contact fetched:', result);
       return res.status(200).json(
          {
             success:true,
@@ -383,7 +398,7 @@ function fetchAdminContact(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error fetching contact:', error);
+      //console.error('Error fetching contact:', error);
       return res.status(500).json(
          {
             success:false,
@@ -404,15 +419,15 @@ function addtoFavorite(req,res){
   const data = req.body;
   customerService.addtoFavorite(data,(error,result)=>{
     if(error){
-      console.log(error);
-      console.log('something went wrong while adding to favorites');
+      //console.log(error);
+      //console.log('something went wrong while adding to favorites');
       return res.status(500).json({
           success:false,
           message:"something went wrong while adding to favorites",
           error:error
       })
    }
-   console.log(result);
+  // console.log(result);
          return res.status(200).json({
             success:true,
             message:"successfully added to favorites",
@@ -424,15 +439,15 @@ function removeFromFavorite(req,res){
   const data = req.body;
   customerService.removeFromFavorite(data,(error,result)=>{
     if(error){
-      console.log(error);
-      console.log('something went wrong while removing from favorites');
+      //console.log(error);
+      //console.log('something went wrong while removing from favorites');
       return res.status(500).json({
           success:false,
           message:"something went wrong while removing from favorites",
           error:error
       })
    }
-   console.log(result);
+   //console.log(result);
          return res.status(200).json({
             success:true,
             message:"successfully removed from favorites"
@@ -444,8 +459,8 @@ function fetchFavoriteProperty(req,res){
   const data = req.body;
   customerService.fetchFavoriteProperty(data,(error,result)=>{
     if(error){
-      console.log(error);
-      console.log('something went wrong while fetching favorite property');
+      //console.log(error);
+      //console.log('something went wrong while fetching favorite property');
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching favorite property",
@@ -453,7 +468,7 @@ function fetchFavoriteProperty(req,res){
           
       })
    }
-   console.log(result);
+  // console.log(result);
          return res.status(200).json({
             success:true,
             result:result
@@ -465,8 +480,8 @@ function fetchFavoritePropertyListDetails(req,res){
   const data = req.body;
   customerService.fetchFavoritePropertyListDetails(data,(error,result)=>{
     if(error){
-      console.log(error);
-      console.log('something went wrong while fetching favorite property');
+      //console.log(error);
+    //  console.log('something went wrong while fetching favorite property');
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching favorite property",
@@ -474,7 +489,7 @@ function fetchFavoritePropertyListDetails(req,res){
           
       })
    }
-   console.log(`favorite property is${result.toString()}`);
+  // console.log(`favorite property is${result.toString()}`);
          return res.status(200).json({
             success:true,
             result:result
@@ -490,8 +505,8 @@ function requestVisit(req,res){
    const data = req.body;
    customerService.requestVisit(data, (error, result)=>{
        if(error){
-           console.log(error);
-           console.log('something went wrong while requating for visit');
+          // console.log(error);
+          // console.log('something went wrong while requating for visit');
            return res.status(500).json({
                success:false,
                message:"something went wrong while requesting for visit",
@@ -509,8 +524,8 @@ function fetchVisitRequestedList(req,res){
 
   customerService.fetchVisitRequestedList(filterOptions,paginationOptions,data,(error,result)=>{
     if(error){
-      console.log(error);
-      console.log('something went wrong while fetching visit requested list');
+    //  console.log(error);
+     // console.log('something went wrong while fetching visit requested list');
       return res.status(500).json({
           success:false,
           message:"something went wrong while fetching visit requested list",
@@ -518,7 +533,7 @@ function fetchVisitRequestedList(req,res){
           
       })
    }
-   console.log(result);
+   //console.log(result);
          return res.status(200).json({
             success:true,
             result:result
@@ -530,8 +545,8 @@ function fetchVisitRequestedPropertyDetails(req,res){
    const data = req.body;
    customerService.fetchVisitRequestedPropertyDetails(data,(error,result)=>{
      if(error){
-       console.log(error);
-       console.log('something went wrong while fetching visit requested property details');
+      // console.log(error);
+      // console.log('something went wrong while fetching visit requested property details');
        return res.status(500).json({
            success:false,
            message:"something went wrong while fetching visit requested list property details",
@@ -539,7 +554,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
            
        })
     }
-    console.log(result);
+   // console.log(result);
           return res.status(200).json({
              success:true,
              result:result[0]
@@ -551,7 +566,7 @@ function fetchVisitRequestedPropertyDetails(req,res){
 function changeVisitStatus(req,res){
    const data = req.body;
    customerService.changeVisitStatus(data).then((result) => {
-      console.log('status changed:', result);
+      //console.log('status changed:', result);
       return res.status(200).json(
          {
             success:true,
@@ -560,11 +575,36 @@ function changeVisitStatus(req,res){
       )
     })
     .catch((error) => {
-      console.error('Error changing staus:', error);
+      //console.error('Error changing staus:', error);
       return res.status(500).json(
          {
             success:false,
             message:"error changing status",
+            error:error
+         }
+      )
+    });
+ }
+
+
+ function fetchBlog(req,res){
+   const {paginationOptions} = req.body;
+   customerService.fetchBlog(paginationOptions).then((result) => {
+      //console.log('blog fetched:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"blog fetched successfully",
+            result:result
+         }
+      )
+    })
+    .catch((error) => {
+      //console.error('Error fetching blog:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error fetching blog",
             error:error
          }
       )
@@ -605,7 +645,8 @@ function changeVisitStatus(req,res){
   requestVisit,  
   fetchVisitRequestedList,
   fetchVisitRequestedPropertyDetails,
-  changeVisitStatus
+  changeVisitStatus,
+  fetchBlog
   
 
 }
