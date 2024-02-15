@@ -8,3 +8,11 @@ npm i  cors dotnet express fs image-size json-web-token jsonwebtoken multer mysq
 nodemon
 
 # this is changes in y_k_server
+
+SSl ADDED
+
+nip.io //new domain
+ipaddress.nip.io
+
+
+# redme file demo change

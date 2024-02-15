@@ -616,6 +616,7 @@ module.exports = {
     uploadPropertyImage,
     deletePropertyImage,
     changeVisitStatus,
+
     fetchAllCustomerList,
     fetchAllEmployeeList,
     postBlog,

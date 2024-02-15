@@ -94,8 +94,13 @@ function updateCustomerDetails(req,res){
    const data = req.body;
    customerService.updateCustomerDetails(data,(error,result)=>{
        if(error){
+
            //console.log(error);
            //console.log('something went wrong while updating customer details');
+
+         console.log(error);
+           console.log('something went wrong while updating customer details');
+
            return res.status(500).json({
                success:false,
                message:"something went wrong while updating customer details",
@@ -103,8 +108,12 @@ function updateCustomerDetails(req,res){
            })
         }
         if (result.message) {
+
            
          ///console.log(result.message);
+
+           console.log(result.message);
+
            return res.status(400).json({
                success: false,
                message: result.message,
@@ -122,7 +131,8 @@ function updateCustomerDetails(req,res){
 }
 
 
-
+   });
+}
 
 
 function sendOtpForLogin(req, res) {
