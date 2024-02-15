@@ -451,7 +451,33 @@ function postBlog(req,res){
          }
       )
     });
+}
+
+
+function changeEmployeeStatus(req,res){
+   const data = req.body;
+   adminService.changeEmployeeStatus(data).then((result) => {
+      console.log('status changed:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"status changed successfully"
+         }
+      )
+    })
+    .catch((error) => {
+      console.error('Error changing staus:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error changing status",
+            error:error
+         }
+      )
+    });
  }
+
+
  
 module.exports = {
    sendOtpForAdminLogin,
@@ -471,5 +497,6 @@ module.exports = {
    changeVisitStatus,
    fetchAllCustomerList,
    fetchAllEmployeeList,
-   postBlog
+   postBlog,
+   changeEmployeeStatus
 }   

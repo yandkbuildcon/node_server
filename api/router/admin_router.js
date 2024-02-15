@@ -31,6 +31,7 @@ adminRouter.put('/changePropertyAvailability', auth.authenticateToken, adminCont
 adminRouter.post('/fetchAllCustomerList', auth.authenticateToken, adminController.fetchAllCustomerList);
 adminRouter.post('/fetchAllEmployeeList', auth.authenticateToken, adminController.fetchAllEmployeeList);
 adminRouter.post('/postBlog', auth.authenticateToken, adminController.postBlog);
+adminRouter.put('/changeEmployeeStatus', auth.authenticateToken, adminController.changeEmployeeStatus);
 
 
 module.exports = adminRouter;

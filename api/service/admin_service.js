@@ -574,6 +574,26 @@ function postBlog(data){
     });
 }
 
+function changeEmployeeStatus(data){
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        UPDATE employee SET status = ? WHERE employee_id = ?;
+        `,
+        [
+          data.newStatus,
+          data.employee_id
+      ],
+        (updateError, updateResult) => {
+          if (updateError) {
+            return reject(updateError);
+          }
+          resolve(updateResult);
+        }
+      );
+    });
+}
+
 
 module.exports = {
     sendOtpForAdminLogin,
@@ -598,5 +618,6 @@ module.exports = {
     changeVisitStatus,
     fetchAllCustomerList,
     fetchAllEmployeeList,
-    postBlog
+    postBlog,
+    changeEmployeeStatus
 }
