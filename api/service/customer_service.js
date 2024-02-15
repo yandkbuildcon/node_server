@@ -29,8 +29,8 @@ function sendOtpForSignup(data){
         otpCache.set(data.c_email, { otp, expirationTime });
         const otpData = otpCache.get(data.c_email);
 
-        console.log(otpData.otp);
-        console.log(otpData.expirationTime);
+        //console.log(otpData.otp);
+        //console.log(otpData.expirationTime);
 
         mailer
           .sendEmail(data.c_email, 'signup verification code', `Your Signup verification code is: ${otp}`)
@@ -52,11 +52,11 @@ function sendOtpForSignup(data){
 
 function verifyOtpForSignup(data, callback){
   const otpData = otpCache.get(data.c_email);
-  console.log(otpData.otp);
+  //console.log(otpData.otp);
 
   if (otpData.otp === data.c_otp){
       const currentTime = Date.now();
-      console.log('valid otp');
+      //console.log('valid otp');
       if(currentTime<= otpData.expirationTime){
           // Check if the combination of u_id and s_id already exists
      // If the combination does not exist, insert the record
@@ -87,6 +87,35 @@ function verifyOtpForSignup(data, callback){
   }else{
       callback({ message: 'Invalid OTP' });
   }
+}
+
+function updateCustomerDetails(data,callback){
+  //console.log('update customer methond called');
+  const sqlQuery = `
+  UPDATE customer SET
+  customer_name = '${data.c_name}',
+  customer_mobile = ${data.c_mobile}, 
+  customer_email = '${data.c_email}',
+  customer_address = '${data.c_address}',
+  customer_locality = '${data.c_locality}', 
+  customer_city = '${data.c_city}', 
+  customer_pincode = ${data.c_pincode}
+  WHERE customer_id = ${data.c_id}
+  `;
+  //console.log(sqlQuery);
+  conn.query(
+    `
+     ${sqlQuery}
+    `,
+    [],
+    (updateError, updateResult) => {
+        if (updateError) {
+            return callback(updateError);
+        }
+
+        return callback(null, updateResult);
+    }
+);
 }
 
 function customerSignup(data, callback) {
@@ -155,8 +184,8 @@ function sendOtpForLogin(data) {
           otpCache.set(data.c_email, { otp, expirationTime });
           const otpData = otpCache.get(data.c_email);
   
-          console.log(otpData.otp);
-          console.log(otpData.expirationTime);
+          //console.log(otpData.otp);
+          //console.log(otpData.expirationTime);
   
           mailer
             .sendEmail(data.c_email, 'login otp', `Your login OTP is: ${otp}`)
@@ -177,15 +206,15 @@ function sendOtpForLogin(data) {
 }
 function verifyOtpForLogin(data, callback){
     const otpData = otpCache.get(data.c_email);
-    console.log(otpData.otp);
+    //console.log(otpData.otp);
 
     if (otpData.otp === data.c_otp){
         const currentTime = Date.now();
-        console.log('valid otp');
+       // console.log('valid otp');
         if(currentTime<= otpData.expirationTime){
             const token = auth.generateAccessToken(data.c_email);
-            console.log('authenticated otp');
-            console.log(token);
+         //   console.log('authenticated otp');
+          //  console.log(token);
             callback(null, token );
 
         }else{
@@ -250,14 +279,14 @@ function fetchAllProperties(callback){
           if (selectError) {
               return callback(selectError);
           }
-          console.log(selectResult);
+        //  console.log(selectResult);
           if (selectResult && selectResult.pi_name) {
               selectResult.pi_name = selectResult.pi_name.split(',');
             } else {
               // Set pi_name to null or an empty array if there are no images
               selectResult.pi_name = []; // or an empty array []
             }
-          console.log(selectResult);
+          //console.log(selectResult);
           return callback(null, selectResult);
       }
 
@@ -267,8 +296,8 @@ function fetchAllProperties(callback){
 //===========================================fetch all proeprty by pegination
 function fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOptions, callback) {
   // Define the filter conditions
-  console.log(`filter option is ${filterOptions.propertytype}`);
-  console.log(`pegination option is ${paginationOptions}`);
+  //console.log(`filter option is ${filterOptions.propertytype}`);
+  //console.log(`pegination option is ${paginationOptions}`);
   const filterConditions = [];
   const filterValues = [];
 
@@ -276,6 +305,36 @@ function fetchAllPropertiesWithPaginationAndFilter(filterOptions, paginationOpti
     filterConditions.push(`property_type = '${filterOptions.propertytype}'`);
     filterValues.push(filterOptions.propertytype);
   }
+
+
+
+      // Check if project id is provided
+if (filterOptions.propertyUn !== undefined && filterOptions.propertyUn !== null) {
+  if (filterOptions.propertyUn === 0) {
+    // Include 0 bhk and greater than 0 bhk
+    filterConditions.push(`property.property_un >= ${0}`);
+  } else {
+    // Include specific bhk
+    filterConditions.push(`property.property_un = ${filterOptions.propertyUn}`);
+    filterValues.push(filterOptions.propertyUn);
+  }
+}
+
+
+
+    // Check if project id is provided
+if (filterOptions.projectId !== undefined && filterOptions.projectId !== null) {
+  if (filterOptions.projectId === 0) {
+    // Include 0 bhk and greater than 0 bhk
+    filterConditions.push(`property.project_id >= ${0}`);
+  } else {
+    // Include specific bhk
+    filterConditions.push(`property.project_id = ${filterOptions.projectId}`);
+    filterValues.push(filterOptions.projectId);
+  }
+}
+
+
 
   // Check if propertybhk is provided
 if (filterOptions.propertybhk !== undefined && filterOptions.propertybhk !== null) {
@@ -354,21 +413,66 @@ if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !==
 
   // Construct the SQL query with pagination and filtering
   const sqlQuery = `
-    SELECT
-      property.*,
-      GROUP_CONCAT(property_image.image_url) AS pi_name
-    FROM
-      property
-    LEFT JOIN
-      property_image ON property.property_id = property_image.property_id
-    ${whereClause}
-    GROUP BY
-      property.property_id
-    ORDER BY
-      property.property_id
-    LIMIT ?, ?;`;
+  SELECT
+    property.property_id,
+    property.property_name,
+    property.property_un,
+    property.property_isAvailable,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_counts.review_count, 0) AS review_count
+FROM
+    property
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_counts ON property.property_id = review_counts.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id LIMIT ?,?;
+    `;
 
-    console.log(`sql query is ${sqlQuery}`);
+    const sqlQuery2 = `
+    SELECT
+    property.property_id,
+    property.property_name,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_count, 0) AS review_count
+FROM
+    property
+
+LEFT JOIN
+    major_project ON property.project_id = major_project.project_id    
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id        
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_count ON property.property_id = review_count.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id
+LIMIT ?, ?;
+    `;
+
+    //console.log(`sql query is ${sqlQuery}`);
 
   // Combine filter values and pagination values                      ...filterValues,
   const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
@@ -391,34 +495,54 @@ if (filterOptions.propertyfloor !== undefined && filterOptions.propertyfloor !==
       }
     });
 
-    console.log(selectResult);
+    //console.log(selectResult);
     return callback(null, selectResult);
   });
 }
 
 function fetchSinglePropertyById(p_id){
 
+ // console.log(`property id is ${p_id}`);
   return new Promise((resolve, reject) => {
     // Check if the combination of u_id and s_id already exists
-    conn.query(
-        `
-        SELECT
+    const sqlQuery2 = `
+    SELECT
     property.*,
-    GROUP_CONCAT(property_image.image_url) AS pi_name
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS property_rating,
+    COALESCE(COUNT(review.r_id), 0) AS total_review
 FROM
     property
 LEFT JOIN
     property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
 WHERE
     property.property_id = ?
 GROUP BY
     property.property_id;
-        `,
+    `;
+
+    conn.query(
+        `${sqlQuery2}`,
         [p_id],
         (selectError, selectResult) => {
             if (selectError) {
                 reject(selectError);
             }
+           // console.log(selectResult);
+            // Iterate through the result rows
+    selectResult.forEach(row => {
+      // Check if pi_name is not null
+      if (row.pi_name) {
+        // Split the pi_name string into an array
+        row.pi_name = row.pi_name.split(',');
+      } else {
+        // Set pi_name to an empty array if there are no images
+        row.pi_name = [];
+      }
+    });
+
             resolve(selectResult); 
         }
     );
@@ -462,7 +586,7 @@ function submitPropertyRating(data) {
           // Update the review with or without feedback
           const updateQuery = `
             UPDATE review 
-            SET r_rating = ${global.newRating}, r_detail = ${data.feedback ? `'${data.feedback}'` : 'NULL'} 
+            SET r_rating = ${data.rating}, r_detail = ${data.feedback ? `'${data.feedback}'` : 'NULL'} 
             WHERE customer_id = ${data.c_id} AND property_id = ${data.p_id}`;
 
           conn.query(updateQuery, [], (updateErr, updateResult) => {
@@ -470,20 +594,7 @@ function submitPropertyRating(data) {
               reject(updateErr);
               return;
             }
-
-            // Update the rating and rating count in the properties table
-            conn.query(
-              `UPDATE property SET property_rating = ?, property_ratingCount = (SELECT COUNT(*) FROM review WHERE property_id = ?) WHERE property_id = ?`,
-              [global.newRating, data.p_id, data.p_id],
-              (propertyUpdateErr, propertyUpdateResult) => {
-                if (propertyUpdateErr) {
-                  reject(propertyUpdateErr);
-                  return;
-                }
-
-                resolve(propertyUpdateResult);
-              }
-            );
+            resolve(updateResult);
           });
         } else {
           // Insert a new review record
@@ -495,20 +606,7 @@ function submitPropertyRating(data) {
                 reject(insertErr);
                 return;
               }
-
-              // Update the rating and rating count in the properties table
-              conn.query(
-                `UPDATE property SET property_rating = ?, property_ratingCount = (SELECT COUNT(*) FROM review WHERE property_id = ?) WHERE property_id = ?`,
-                [data.rating, data.p_id, data.p_id],
-                (propertyUpdateErr, propertyUpdateResult) => {
-                  if (propertyUpdateErr) {
-                    reject(propertyUpdateErr);
-                    return;
-                  }
-
-                  resolve(propertyUpdateResult);
-                }
-              );
+              resolve(insertResult);
             }
           );
         }
@@ -638,12 +736,22 @@ function fetchFavoritePropertyListDetails(data,callback){
    GROUP BY
        property.property_id;`,
        [data.c_id],
-       (selectErr,selectRes)=>{
-        if(selectErr){
-          return callback(selectErr);
+       (selectError,selectResult)=>{
+        if(selectError){
+          return callback(selectError);
         }
-        console.log(selectRes);
-        return callback(null,selectRes);
+        selectResult.forEach(row => {
+          // Check if pi_name is not null
+          if (row.pi_name) {
+            // Split the pi_name string into an array
+            row.pi_name = row.pi_name.split(',');
+          } else {
+            // Set pi_name to an empty array if there are no images
+            row.pi_name = [];
+          }
+        });
+        //(selectRes);
+        return callback(null,selectResult);
        }
     );
 }
@@ -730,8 +838,8 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
          ${orderByClause}
          ${limitOffsetClause}
     ` ;
-    console.log(`customer id is : ${data.c_id}`);
-    console.log(sqlQuery);
+    //console.log(`customer id is : ${data.c_id}`);
+    //console.log(sqlQuery);
   conn.query(
      sqlQuery,
      [],
@@ -769,7 +877,7 @@ function fetchVisitRequestedPropertyDetails(data, callback){
 }
 
 function changeVisitStatus(data){
-  console.log(data);
+  //console.log(data);
   return new Promise((resolve, reject) => {
       conn.query(
         `
@@ -792,10 +900,28 @@ function changeVisitStatus(data){
 }
 
 
+function fetchBlog(paginationOptions){
+  const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
+  return new Promise((resolve, reject) => {
+    conn.query(
+      `SELECT * FROM blog LIMIT ?`,
+      [queryValues],
+      (selectError, selectResult) => {
+        if (selectError) {
+          return reject(selectError);
+        }
+        resolve(selectResult);
+      }
+    );
+  });
+}
+
+
 module.exports = {
   customerSignup, 
   sendOtpForSignup,
   verifyOtpForSignup,
+  updateCustomerDetails,
   sendOtpForLogin, 
   verifyOtpForLogin, 
   customerProfile,
@@ -820,6 +946,7 @@ module.exports = {
   requestVisit,
   fetchVisitRequestedList,
   fetchVisitRequestedPropertyDetails,
-  changeVisitStatus
+  changeVisitStatus,
+  fetchBlog
 }
 

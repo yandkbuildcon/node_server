@@ -284,6 +284,110 @@ function insertPropertyDetails(data, callback) {
   );
 }
 
+function insertProjectDetails(data, callback) {
+    
+  // Check if the combination of u_id and s_id already exists
+  conn.query(
+      'SELECT * FROM major_project WHERE project_un=?',
+      [data.project_un],
+      (selectError, selectResult) => {
+          if (selectError) {
+              return callback(selectError);
+          }
+
+          // If the combination already exists, return a message
+          if (selectResult.length > 0) {
+              const message = 'project already exist with this unique number.';
+              return callback(null, { message });
+          }
+
+          // If the combination does not exist, insert the record
+          conn.query(
+              `INSERT INTO major_project(
+                  project_name,
+                  project_un,
+                  project_city,
+                  project_locality,
+                  project_state,
+                  project_pincode
+                  ) VALUES (?, ?, ?, ?, ?,?)`,
+              [
+                data.project_name,
+                data.project_un,
+                data.project_city,
+                data.project_locality,
+                data.project_state,
+                data.project_pincode
+
+              ],
+              (insertError, insertResult) => {
+                  if (insertError) {
+                      return callback(insertError);
+                  }
+
+                  return callback(null, insertResult);
+              }
+          );
+      }
+  );
+}
+
+function fetchProject(){
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        SELECT project_id, project_name FROM major_project
+        `,
+        [],
+        (selectError, selectResult) => {
+          if (selectError) {
+            return reject(selectError);
+          }
+          resolve(selectResult);
+        }
+      );
+    });
+}
+
+function fetchProjectWithPagination(filterOptions,paginationOptions){
+  const filterConditions = [];
+ 
+ 
+   if (filterOptions.searchItem) {
+    filterConditions.push(`project_name LIKE '%${filterOptions.searchItem}%'`);
+  }
+
+  if (filterOptions.searchItem) {
+    filterConditions.push(`project_city LIKE '%${filterOptions.searchItem}%'`);
+  }
+
+  if (filterOptions.searchItem) {
+    filterConditions.push(`project_locality LIKE '%${filterOptions.searchItem}%'`);
+  }
+
+  if (filterOptions.searchItem) {
+    filterConditions.push(`project_state LIKE '%${filterOptions.searchItem}%'`);
+  }
+ 
+   
+   // Construct the WHERE clause based on the filter conditions
+   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' OR ')}` : '';
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        SELECT * FROM major_project ${whereClause} LIMIT ?,?
+        `,
+        [(paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit],
+        (selectError, selectResult) => {
+          if (selectError) {
+            return reject(selectError);
+          }
+          resolve(selectResult);
+        }
+      );
+    });
+}
+
 function changePropertyAvailability(data){
   return new Promise((resolve, reject) => {
     // Check if the combination of u_id and s_id already exists
@@ -407,6 +511,69 @@ function fetchAllCustomerList(filterOptions,paginationOptions){
     });
 }
 
+function fetchAllEmployeeList(filterOptions,paginationOptions){
+   
+  const filterConditions = [];
+
+
+  if (filterOptions.searchItem) {
+   filterConditions.push(`name LIKE '%${filterOptions.searchItem}%'`);
+ }
+
+ if (filterOptions.searchItem) {
+   filterConditions.push(`email LIKE '%${filterOptions.searchItem}%'`);
+ }
+
+ if (filterOptions.searchItem) {
+   filterConditions.push(`mobile LIKE '%${filterOptions.searchItem}%'`);
+ }
+
+ if (filterOptions.searchItem) {
+   filterConditions.push(`city LIKE '%${filterOptions.searchItem}%'`);
+ }
+
+  
+  // Construct the WHERE clause based on the filter conditions
+  const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' OR ')}` : '';
+
+  
+ return new Promise((resolve, reject) => {
+     conn.query(
+       `
+       select * from employee ${whereClause} LIMIT ?,?;
+       `,
+       [(paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit],
+       (selectError, selectResult) => {
+         if (selectError) {
+           return reject(selectError);
+         }
+         resolve(selectResult);
+       }
+     );
+   });
+}
+
+function postBlog(data){
+  return new Promise((resolve, reject) => {
+      conn.query(
+        `
+        INSERT INTO blog(blog_title, blog_subtitle, blog_url) VALUES (?,?,?)
+        `,
+        [
+          data.blog_title,
+          data.blog_subtitle,
+          data.blog_url
+      ],
+        (updateError, updateResult) => {
+          if (updateError) {
+            return reject(updateError);
+          }
+          resolve(updateResult);
+        }
+      );
+    });
+}
+
 
 module.exports = {
     sendOtpForAdminLogin,
@@ -416,6 +583,11 @@ module.exports = {
 
 
     insertPropertyDetails,
+    insertProjectDetails,
+    fetchProject,
+    fetchProjectWithPagination,
+
+
     changePropertyAvailability,
     insertAdminContact,
     uploadOffer,
@@ -424,5 +596,7 @@ module.exports = {
     uploadPropertyImage,
     deletePropertyImage,
     changeVisitStatus,
-    fetchAllCustomerList
+    fetchAllCustomerList,
+    fetchAllEmployeeList,
+    postBlog
 }
