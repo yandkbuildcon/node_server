@@ -90,7 +90,11 @@ function verifyOtpForSignup(data, callback){
 }
 
 function updateCustomerDetails(data,callback){
+
   //console.log('update customer methond called');
+
+  console.log('update customer methond called');
+
   const sqlQuery = `
   UPDATE customer SET
   customer_name = '${data.c_name}',
@@ -102,7 +106,11 @@ function updateCustomerDetails(data,callback){
   customer_pincode = ${data.c_pincode}
   WHERE customer_id = ${data.c_id}
   `;
+
   //console.log(sqlQuery);
+
+  console.log(sqlQuery);
+
   conn.query(
     `
      ${sqlQuery}
@@ -117,6 +125,10 @@ function updateCustomerDetails(data,callback){
     }
 );
 }
+
+
+
+
 
 function customerSignup(data, callback) {
     
@@ -472,13 +484,46 @@ ORDER BY
 LIMIT ?, ?;
     `;
 
+
     //console.log(`sql query is ${sqlQuery}`);
+
+  const sqlQuery2 = `
+    SELECT
+    property.property_id,
+    property.property_name,
+    property.property_price,
+    property.property_area,
+    property.property_areaUnit,
+    property.property_locality,
+    property.property_city,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(SUM(review.r_rating), 0) AS total_rating,
+    COALESCE(review_count, 0) AS review_count
+FROM
+    property
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    review ON property.property_id = review.property_id
+LEFT JOIN
+    (SELECT property_id, COUNT(*) AS review_count FROM review GROUP BY property_id) AS review_counts ON property.property_id = review_counts.property_id
+${whereClause}
+GROUP BY
+    property.property_id
+ORDER BY
+    property.property_id
+LIMIT ?, ?;
+    `;
+
+  
+
+    console.log(`sql query is ${sqlQuery}`);
 
   // Combine filter values and pagination values                      ...filterValues,
   const queryValues = [ (paginationOptions.page-1)*paginationOptions.limit, paginationOptions.limit];
 
   // Execute the SQL query
-  conn.query(sqlQuery, queryValues, (selectError, selectResult) => {
+  conn.query(sqlQuery2, queryValues, (selectError, selectResult) => {
     if (selectError) {
       return callback(selectError);
     }
@@ -502,10 +547,13 @@ LIMIT ?, ?;
 
 function fetchSinglePropertyById(p_id){
 
+
  // console.log(`property id is ${p_id}`);
   return new Promise((resolve, reject) => {
     // Check if the combination of u_id and s_id already exists
     const sqlQuery2 = `
+    const sqlQuery2 = `
+
     SELECT
     property.*,
     GROUP_CONCAT(property_image.image_url) AS pi_name,
@@ -523,6 +571,8 @@ GROUP BY
     property.property_id;
     `;
 
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
     conn.query(
         `${sqlQuery2}`,
         [p_id],

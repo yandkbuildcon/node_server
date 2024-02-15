@@ -2,9 +2,10 @@
 require('dotenv').config();
 const path = require('path');
 const cors = require('cors'); // chatgpt
+const https = require('https');
+const fs = require('fs');
 const express = require('express');
 const app = express();
-
 
 
 //=====================================CONFIGURE EXPRESS
@@ -118,6 +119,28 @@ app.use((req, res) => {
 
 // -------------------------------------------webpage end
 
+
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).send('Internal Server Error');
+});
+
+// ---------------------------------------------------------------------------
+
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/54.82.47.83.nip.io/fullchain.pem'),
+};
+
+const httpsServer = https.createServer(options, app);
+httpsServer.listen(443, () => {
+  console.log('HTTPS Server listening on port 443 ');
+});
+
+// ---------------------------------------------------------------------------
+// Start the HTTP server on port 80
 
 
 
