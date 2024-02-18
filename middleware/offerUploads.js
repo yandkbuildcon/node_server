@@ -42,10 +42,10 @@ module.exports = (req, res, next) => {
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
             // A Multer error occurred during upload
-            return res.status(400).json({ success: false, message: err.message });
+            return res.status(400).json({ success: false, message: err.message, error:err });
         } else if (err) {
             // An unknown error occurred during upload
-            return res.status(500).json({ success: false, message: 'Internal Server Error' });
+            return res.status(500).json({ success: false, message: 'Internal Server Error', error:err });
         }
 
         // No errors occurred during upload
