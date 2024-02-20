@@ -174,6 +174,11 @@ if (filterOptions.requestStatus !== undefined && filterOptions.requestStatus !==
       //filterValues.push(filterOptions.propertybhk);
     }
   }
+
+if (filterOptions.employee_un !== undefined && filterOptions.employee_un !== null) {
+    filterConditions.push(`employee_un = '${filterOptions.employee_un}'`);
+  }
+    
   // Construct the WHERE clause based on the filter conditions
   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
 
