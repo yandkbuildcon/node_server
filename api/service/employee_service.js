@@ -78,8 +78,9 @@ function verifyOtpForEmployeeSignup(data, callback){
             nominee_name,
             nominee_dob,
             relation,
-            referal_code 
-            ) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?,?,?,?,?)`,
+            referal_code,
+            employee_code
+            ) VALUES (?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)`,
         [
             data.name,
             data.mobile,
@@ -98,7 +99,8 @@ function verifyOtpForEmployeeSignup(data, callback){
             data.nominee_name,
             data.nominee_dob,
             data.relation,
-            data.referal_code
+            data.referal_code,
+            data.employee_code
   
         ],
         (insertError, insertResult) => {
