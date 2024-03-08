@@ -723,19 +723,34 @@ function fetchFavoriteProperty(data,callback){
 function fetchFavoritePropertyListDetails(data,callback){
     conn.query(
        `SELECT
-       property.*,
-       GROUP_CONCAT(property_image.image_url) AS pi_name
+       p.*,
+       GROUP_CONCAT(pi.image_url) AS pi_name,
+       COALESCE(r.total_rating, 0) AS total_rating,
+       COALESCE(r.review_count, 0) AS review_count
    FROM
-       property
+       favorite_property fp
    JOIN
-       favorite_property ON property.property_id = favorite_property.property_id
+       property p ON fp.property_id = p.property_id
    LEFT JOIN
-       property_image ON property.property_id = property_image.property_id
+       property_image pi ON p.property_id = pi.property_id
+   LEFT JOIN
+       (
+           SELECT
+               property_id,
+               SUM(r_rating) AS total_rating,
+               COUNT(r_id) AS review_count
+           FROM
+               review
+           WHERE
+               customer_id = ${data.c_id}  
+           GROUP BY
+               property_id
+       ) AS r ON p.property_id = r.property_id
    WHERE
-       favorite_property.customer_id = ?
+       fp.customer_id = ${data.c_id}  
    GROUP BY
-       property.property_id;`,
-       [data.c_id],
+       p.property_id;`,
+       [],
        (selectError,selectResult)=>{
         if(selectError){
           return callback(selectError);
@@ -802,11 +817,11 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
         }
       }
 
-      if (data.c_id !== undefined && data.c_id !== null) {
-          // Include specific request status
-          filterConditions.push(`visit.customer_id = ${data.c_id}`);
+      // if (data.c_id !== undefined && data.c_id !== null) {
+      //     // Include specific request status
+      //     filterConditions.push(`visit.customer_id = ${data.c_id}`);
         
-      }
+      // }
 
 
       // Construct the WHERE clause based on the filter conditions
@@ -820,23 +835,41 @@ function fetchVisitRequestedList(filterOptions, paginationOptions,data,callback)
     const limitOffsetClause = `LIMIT ${limit} OFFSET ${offset}`;
 
     const sqlQuery = `
+    SELECT
+    property.*,
+    visit.v_status,
+    visit.v_id,
+    visit.v_date,
+    visit.visiting_date,
+    GROUP_CONCAT(property_image.image_url) AS pi_name,
+    COALESCE(r.total_rating, 0) AS total_rating,
+    COALESCE(r.review_count, 0) AS review_count
+FROM
+    property
+JOIN
+    visit ON property.property_id = visit.property_id
+LEFT JOIN
+    property_image ON property.property_id = property_image.property_id
+LEFT JOIN
+    (
         SELECT
-          property.*,
-          visit.v_status,
-          visit.v_id,
-          visit.v_date,
-          GROUP_CONCAT(property_image.image_url) AS pi_name
+            v.property_id,
+            SUM(r_rating) AS total_rating,
+            COUNT(*) AS review_count
         FROM
-          property
+            review r
         JOIN
-          visit ON property.property_id = visit.property_id
-        LEFT JOIN
-          property_image ON property.property_id = property_image.property_id
-         ${whereClause}
-         GROUP BY
-            property.property_id, visit.v_id
-         ${orderByClause}
-         ${limitOffsetClause}
+            visit v ON r.property_id = v.property_id
+        WHERE
+            v.customer_id = ${data.c_id}
+        GROUP BY
+            v.property_id
+    ) AS r ON property.property_id = r.property_id
+${whereClause}
+GROUP BY
+    property.property_id, visit.v_id
+${orderByClause}
+${limitOffsetClause};
     ` ;
     //console.log(`customer id is : ${data.c_id}`);
     //console.log(sqlQuery);
