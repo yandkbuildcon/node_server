@@ -220,7 +220,7 @@ function insertPropertyDetails(data, callback) {
   // Check if the combination of u_id and s_id already exists
   conn.query(
       'SELECT * FROM property WHERE property_un=?',
-      [data.p_un],
+      [data.property_un],
       (selectError, selectResult) => {
           if (selectError) {
               return callback(selectError);
