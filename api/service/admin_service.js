@@ -254,7 +254,10 @@ function insertPropertyDetails(data, callback) {
                   property_city,
                   property_pincode,
                   property_locationUrl
-                  ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?)`,
+                  property_rating,
+                  property_ratingCount,
+                  project_id
+                  ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?,?,?,?)`,
               [
                 data.p_name, 
                 data.p_un, 
