@@ -278,9 +278,9 @@ function insertPropertyDetails(data, callback) {
                 data.property_city,
                 data.property_pincode,
                 data.property_locationUrl,
-                  data.property_rating,
-                  data.property_ratingCount,
-                  data.project_id
+                data.property_rating,
+                data.property_ratingCount,
+                data.project_id
 
               ],
               (insertError, insertResult) => {
