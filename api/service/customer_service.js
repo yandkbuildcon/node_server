@@ -652,7 +652,7 @@ function fetchAdminContact(){
 
   return new Promise((resolve, reject)=>{
       conn.query(
-          `SELECT * FROM admin_contact`,
+          `SELECT * FROM admin_contact WHERE email="yandkbuildcon.help@gmail.com`,
           [
           ],
           (selectError, selectResult)=>{
