@@ -88,6 +88,32 @@ function adminProfile(req, res){
 } 
 
 
+function uploadProfilePic(req,res){
+   const ad_id = req.body.ad_id;
+   const profilePic = req.file.filename;
+   //console.log(c_id, profilePic);
+   adminService.uploadProfilePic(ad_id, profilePic).then((result) => {
+      //console.log('profile pic uploaded successfully:', result);
+      return res.status(200).json(
+         {
+            success:true,
+            message:"profile pic uploaded successfully"
+         }
+      )
+    })
+    .catch((error) => {
+      //console.error('Error uploading profile pic:', error);
+      return res.status(500).json(
+         {
+            success:false,
+            message:"error uploading profile pci",
+            error:error
+         }
+      )
+    });
+} 
+
+
 
 function insertAdminContact(req,res){
     const data = req.body;
@@ -212,6 +238,33 @@ function insertPropertyDetails(req,res){
            message:"property listed successfully."
         })
       });
+}
+
+function deleteProperty(req,res){
+   const data = req.body;
+   adminService.deleteProperty(data,(error,result)=>{
+     if(error){
+        console.log(error);
+        console.log('something went wrong while deleting property');
+        return res.status(500).json({
+            success:false,
+            message:"something went wrong while deleting property",
+            error:error
+        })
+     }
+     if (result.message) {
+        console.log(result.message);
+        return res.status(400).json({
+            success: false,
+            message: result.message,
+            error:''
+        });
+    }
+     return res.status(200).json({
+        success:true,
+        message:"property deleted successfully."
+     })
+   });
 }
 
 function insertProjectDetails(req,res){
@@ -484,6 +537,7 @@ module.exports = {
    verifyOtpForAdminLogin,
    adminProfile,
    insertPropertyDetails,
+   deleteProperty,
    insertProjectDetails,
    fetchProject,
    fetchProjectWithPagination,
@@ -498,5 +552,6 @@ module.exports = {
    fetchAllCustomerList,
    fetchAllEmployeeList,
    postBlog,
-   changeEmployeeStatus
+   changeEmployeeStatus,
+   uploadProfilePic
 }   

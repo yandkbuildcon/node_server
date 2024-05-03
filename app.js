@@ -68,6 +68,22 @@ app.use('/api/property/accessPropertyImages', (req, res, next) => {
     });
   });
 
+  
+  //===========================================accessing customer profile pic
+
+  app.use('/api/admin/accessAdminProfilePic', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-cache');
+  
+    // Serve the static image file
+    express.static('storage/adminProfilePic')(req, res, (err) => {
+      if (err) {
+        console.error('Error serving the image:', err);
+        // You can customize the error response as needed
+        res.status(500).send('Error serving the image');
+      }
+    });
+  });
+
 
   //==========================================accessing offer image
 
@@ -124,6 +140,3 @@ app.use((req, res) => {
 app.listen(process.env.host_port, ()=>{
     console.log('server listening on port ', process.env.host_port);
 });
-
-
-
