@@ -3,14 +3,17 @@ const adminController = require('../controller/admin_controller');
 const offerUploads = require('../../middleware/offerUploads');
 const auth = require('../../middleware/auth');
 const propertyUpload = require('../../middleware/propertyImageUploads');
+const adminUploads = require('../../middleware/adminUploads');
 
 adminRouter.post('/insertPropertyDetails', auth.authenticateToken, adminController.insertPropertyDetails);
+adminRouter.post('/deleteProperty', auth.authenticateToken, adminController.deleteProperty);
 adminRouter.post('/insertProjectDetails', auth.authenticateToken, adminController.insertProjectDetails);
 adminRouter.get('/fetchProject', adminController.fetchProject);
 adminRouter.post('/fetchProjectWithPagination', adminController.fetchProjectWithPagination);
 adminRouter.post('/sendOtpForAdminLogin', adminController.sendOtpForAdminLogin);
 adminRouter.post('/verifyOtpForAdminLogin', adminController.verifyOtpForAdminLogin);
 adminRouter.get('/adminProfile', auth.authenticateToken, adminController.adminProfile);
+adminRouter.post('/uploadAdminProfilePic', auth.authenticateToken, adminUploads.single('adminProfilePic') ,adminController.uploadProfilePic);
 
 
 

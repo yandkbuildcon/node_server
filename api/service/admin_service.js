@@ -112,6 +112,26 @@ function insertAdminContact(data){
 
 }
 
+
+function uploadProfilePic(ad_id, profilePic){
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    conn.query(
+        `UPDATE admin SET admin_profilePic = ? WHERE admin_id = ?`,
+        [
+          profilePic,
+          ad_id
+        ],
+        (updateError, updateResult) => {
+            if (updateError) {
+                reject(updateError);
+            }
+            resolve(updateResult); 
+        }
+    );
+});
+}
+
 //http://bhunaksha.cg.nic.in/
 
 function uploadOffer(offerImage, text1, text2, text3, p_id){
@@ -175,10 +195,11 @@ if (filterOptions.requestStatus !== undefined && filterOptions.requestStatus !==
     }
   }
 
-if (filterOptions.employee_un !== undefined && filterOptions.employee_un !== null) {
+  if (filterOptions.employee_un !== undefined && filterOptions.employee_un !== null) {
     filterConditions.push(`employee_un = '${filterOptions.employee_un}'`);
   }
-    
+
+
   // Construct the WHERE clause based on the filter conditions
   const whereClause = filterConditions.length > 0 ? `WHERE ${filterConditions.join(' AND ')}` : '';
 
@@ -257,29 +278,29 @@ function insertPropertyDetails(data, callback) {
                   property_rating,
                   property_ratingCount,
                   project_id
-                  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                  ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?,?,?,?)`,
               [
-                data.property_name, 
-                data.property_un, 
-                data.property_area,
-                data.property_areaUnit,
-                data.property_price,
-                data.property_bookAmount,
-                data.property_type,
-                data.property_bhk,
-                data.property_floor,
-                data.property_isGarden,
-                data.property_isParking,
-                data.property_isFurnished,
-                data.property_isAvailable,
-                data.property_desc,
-                data.property_address,
-                data.property_locality,
-                data.property_city,
-                data.property_pincode,
-                data.property_locationUrl,
-                data.property_rating,
-                data.property_ratingCount,
+                data.p_name, 
+                data.p_un, 
+                data.p_area,
+                data.p_areaUnit,
+                data.p_price,
+                data.p_bookAmount,
+                data.p_type,
+                data.p_bhk,
+                data.p_floor,
+                data.p_isGarden,
+                data.p_isParking,
+                data.p_isFurnished,
+                data.p_isAvailable,
+                data.p_desc,
+                data.p_address,
+                data.p_locality,
+                data.p_city,
+                data.p_pincode,
+                data.p_locationUrl,
+                data.p_rating,
+                data.p_ratingCount,
                 data.project_id
 
               ],
@@ -294,6 +315,157 @@ function insertPropertyDetails(data, callback) {
       }
   );
 }
+
+function deleteProperty(data, callback) {
+  conn.getConnection((err, connection) => {
+      if (err) {
+          callback(err);
+          return;
+      }
+
+      connection.beginTransaction((err) => {
+          if (err) {
+              connection.release();
+              callback(err);
+              return;
+          }
+
+          // Step 1: Delete records from the favorite_property table
+          connection.query(
+              `DELETE FROM favorite_property WHERE property_id = ?`,
+              [data.property_id],
+              (error, deleteFavoriteResult) => {
+                  if (error) {
+                      connection.rollback(() => {
+                          connection.release();
+                          callback(error);
+                      });
+                      return;
+                  }
+
+                  // Step 2: Delete records from the visit table
+                  connection.query(
+                      `DELETE FROM visit WHERE property_id = ?`,
+                      [data.property_id],
+                      (error, deleteVisitResult) => {
+                          if (error) {
+                              connection.rollback(() => {
+                                  connection.release();
+                                  callback(error);
+                              });
+                              return;
+                          }
+
+                          // Step 3: Delete records from the offer table
+                          connection.query(
+                              `DELETE FROM offer WHERE property_id = ?`,
+                              [data.property_id],
+                              (error, deleteOfferResult) => {
+                                  if (error) {
+                                      connection.rollback(() => {
+                                          connection.release();
+                                          callback(error);
+                                      });
+                                      return;
+                                  }
+
+                                  // Step 4: Delete records from the review table
+                                  connection.query(
+                                      `DELETE FROM review WHERE property_id = ?`,
+                                      [data.property_id],
+                                      (error, deleteReviewResult) => {
+                                          if (error) {
+                                              connection.rollback(() => {
+                                                  connection.release();
+                                                  callback(error);
+                                              });
+                                              return;
+                                          }
+
+                                          // Step 5: Delete records from the property_image table
+                                          connection.query(
+                                              `SELECT image_url FROM property_image WHERE property_id = ?`,
+                                              [data.property_id],
+                                              (error, propertyImageResults) => {
+                                                  if (error) {
+                                                      connection.rollback(() => {
+                                                          connection.release();
+                                                          callback(error);
+                                                      });
+                                                      return;
+                                                  }
+
+                                                  connection.query(
+                                                      `DELETE FROM property_image WHERE property_id = ?`,
+                                                      [data.property_id],
+                                                      (error, deleteImageResults) => {
+                                                          if (error) {
+                                                              connection.rollback(() => {
+                                                                  connection.release();
+                                                                  callback(error);
+                                                              });
+                                                              return;
+                                                          }
+
+                                                          // Step 6: Delete record from the property table
+                                                          connection.query(
+                                                              `DELETE FROM property WHERE property_id = ?`,
+                                                              [data.property_id],
+                                                              (error, deletePropertyResult) => {
+                                                                  if (error) {
+                                                                      connection.rollback(() => {
+                                                                          connection.release();
+                                                                          callback(error);
+                                                                      });
+                                                                      return;
+                                                                  }
+
+                                                                  // Step 7: Delete corresponding image files from the folder
+                                                                  const imageUrls = propertyImageResults.map(row => row.image_url);
+                                                                  imageUrls.forEach(imageUrl => {
+                                                                      // Delete file using fs.unlink
+                                                                      fs.unlink(`storage/propertyImages/${imageUrl}`, (err) => {
+                                                                          if (err) {
+                                                                              connection.rollback(() => {
+                                                                                  connection.release();
+                                                                                  callback(err);
+                                                                              });
+                                                                              return;
+                                                                          }
+                                                                          console.log('Deleted file:', imageUrl);
+                                                                      });
+                                                                  });
+
+                                                                  // Commit the transaction
+                                                                  connection.commit((err) => {
+                                                                      if (err) {
+                                                                          connection.rollback(() => {
+                                                                              connection.release();
+                                                                              callback(err);
+                                                                          });
+                                                                          return;
+                                                                      }
+                                                                      connection.release();
+                                                                      callback(null, deletePropertyResult);
+                                                                  });
+                                                              }
+                                                          );
+                                                      }
+                                                  );
+                                              }
+                                          );
+                                      }
+                                  );
+                              }
+                          );
+                      }
+                  );
+              }
+          );
+      });
+  });
+}
+
 
 function insertProjectDetails(data, callback) {
     
@@ -614,6 +786,7 @@ module.exports = {
 
 
     insertPropertyDetails,
+    deleteProperty,
     insertProjectDetails,
     fetchProject,
     fetchProjectWithPagination,
@@ -630,5 +803,6 @@ module.exports = {
     fetchAllCustomerList,
     fetchAllEmployeeList,
     postBlog,
-    changeEmployeeStatus
+    changeEmployeeStatus,
+    uploadProfilePic
 }
