@@ -589,6 +589,25 @@ function changePropertyAvailability(data){
 });
 }
 
+function updateYoutubeLink(data){
+  return new Promise((resolve, reject) => {
+    // Check if the combination of u_id and s_id already exists
+    conn.query(
+        `UPDATE property SET youtubelink = ? WHERE property_id = ?`,
+        [
+          data.youtubelink,
+          data.p_id,
+        ],
+        (updateError, updateResult) => {
+            if (updateError) {
+                reject(updateError);
+            }
+            resolve(updateResult); 
+        }
+    );
+});
+}
+
 function uploadPropertyImage(p_id, propertyImage, callback){
 
     conn.query(
@@ -792,6 +811,7 @@ module.exports = {
 
 
     changePropertyAvailability,
+    updateYoutubeLink,
     insertAdminContact,
     uploadOffer,
     deleteOffer,
