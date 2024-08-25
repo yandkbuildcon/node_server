@@ -277,6 +277,7 @@ function insertPropertyDetails(data, callback) {
                   property_locationUrl,
                   property_rating,
                   property_ratingCount,
+                  youtubelink,
                   project_id
                   ) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?,?,?,?)`,
                   [
@@ -301,6 +302,7 @@ function insertPropertyDetails(data, callback) {
                     data.property_locationUrl,
                     data.property_rating,
                     data.property_ratingCount,
+                    data.youtubelink,
                     data.project_id
                  ],    
               (insertError, insertResult) => {
